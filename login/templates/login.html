@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div style="display: flex; justify-content: center; align-items: center; height: 100%">
+        <div style="color: red">
+            {{ message }}
+        </div>
+        <form method="post" action="/login/">
+            {% csrf_token %}
+            <div>
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username">
+            </div>
+            <div>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password">
+            </div>
+            <div>
+                Don't have an account yet? You can register <a href="/login/register/">here</a>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+{% endblock %}

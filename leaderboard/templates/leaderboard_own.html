@@ -1,0 +1,140 @@
+{% extends 'app.html' %}
+
+{% block app %}
+    <h2>
+        Own profile
+    </h2>
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                Rating:
+            </td>
+            <td>
+                {{ profile.rating }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Wins:
+            </td>
+            <td>
+                {{ profile.wins }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Losses:
+            </td>
+            <td>
+                {{ profile.losses }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Ties:
+            </td>
+            <td>
+                {{ profile.ties }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Total:
+            </td>
+            <td>
+                {{ profile.total_games }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Winrate:
+            </td>
+            <td>
+                {{ profile.winrate }}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <hr>
+    <h3>
+        Recent matches
+    </h3>
+    <table>
+        <thead>
+        <tr>
+            <th>
+                Match
+            </th>
+            <th>
+                Result
+            </th>
+            <th>
+                Score
+            </th>
+            <th>
+                Rating change
+            </th>
+            <th>
+                Date
+            </th>
+            <th>
+                Delete
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for match in matches %}
+            <tr>
+                <td>
+                    <a href="/leaderboard/{{ match.player1 }}">{{ match.player1 }}</a> vs <a
+                        href="/leaderboard/{{ match.player2 }}">{{ match.player2 }}</a>
+                </td>
+                {% if match.result == 'Win' %}
+                    <td style="color: green">
+                        {{ match.result }}
+                    </td>
+                {% elif match.result == 'Loss' %}
+                    <td style="color: red">
+                        {{ match.result }}
+                    </td>
+                {% else %}
+                    <td style="color: orange">
+                        {{ match.result }}
+                    </td>
+                {% endif %}
+                <td>
+                    {{ match.score }}
+                </td>
+                {% if match.rating > 0 %}
+                    <td style="color: green">
+                        {{ match.rating }}
+                    </td>
+                {% else %}
+                    <td style="color: red">
+                        {{ match.rating }}
+                    </td>
+                {% endif %}
+                <td>
+                    {{ match.date }}
+                </td>
+                <td style="text-align: center">
+                    <button onclick="delete_entry({{ match.db_id }})">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+{% block scripts %}
+    <script>
+        function delete_entry(db_id) {
+            if (!confirm("Are you sure you want to delete this match. The Rating will be refunded")) {
+                return;
+            }
+            window.location = `/leaderboard/delete/${db_id}`
+        }
+    </script>
+{% endblock %}

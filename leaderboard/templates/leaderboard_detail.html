@@ -1,0 +1,195 @@
+{% extends 'app.html' %}
+
+{% block app %}
+    <div style="display: flex">
+        <div style="flex: 45%">
+            <h2 style="text-align: center">
+                Profile of {{ profile.name }}
+            </h2>
+        </div>
+        <div style="flex: 10%">
+        </div>
+        <div style="flex: 45%">
+            <h2 style="text-align: center">
+                Profile of {{ my.name }}
+            </h2>
+        </div>
+    </div>
+    <div style="display: flex">
+        <div style="flex: 45%">
+            <table>
+                <tbody>
+                <tr>
+                    <td>
+                        Rating:
+                    </td>
+                    <td>
+                        {{ profile.rating }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Wins:
+                    </td>
+                    <td>
+                        {{ profile.wins }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Losses:
+                    </td>
+                    <td>
+                        {{ profile.losses }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Ties:
+                    </td>
+                    <td>
+                        {{ profile.ties }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Total:
+                    </td>
+                    <td>
+                        {{ profile.total_games }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Winrate:
+                    </td>
+                    <td>
+                        {{ profile.winrate }}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="flex: 10%; text-align: center">
+            VS
+        </div>
+        <div style="flex: 45%">
+            <table>
+                <tbody>
+                <tr>
+                    <td>
+                        Rating:
+                    </td>
+                    <td>
+                        {{ my.rating }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Wins:
+                    </td>
+                    <td>
+                        {{ my.wins }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Losses:
+                    </td>
+                    <td>
+                        {{ my.losses }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Ties:
+                    </td>
+                    <td>
+                        {{ my.ties }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Total:
+                    </td>
+                    <td>
+                        {{ my.total_games }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Winrate:
+                    </td>
+                    <td>
+                        {{ my.winrate }}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <hr>
+    <h3>
+        Recent matches of {{ profile.name }}
+    </h3>
+    <table>
+        <thead>
+        <tr>
+            <th>
+                Match
+            </th>
+            <th>
+                Result
+            </th>
+            <th>
+                Score
+            </th>
+            <th>
+                Rating change
+            </th>
+            <th>
+                Date
+            </th>
+
+        </tr>
+        </thead>
+        <tbody>
+        {% for match in matches %}
+            <tr>
+                <td>
+                    <a href="/leaderboard/{{ match.player1 }}">{{ match.player1 }}</a> vs <a
+                        href="/leaderboard/{{ match.player2 }}">{{ match.player2 }}</a>
+                </td>
+                {% if match.result == 'Win' %}
+                    <td style="color: green">
+                        {{ match.result }}
+                    </td>
+                {% elif match.result == 'Loss' %}
+                    <td style="color: red">
+                        {{ match.result }}
+                    </td>
+                {% else %}
+                    <td style="color: orange">
+                        {{ match.result }}
+                    </td>
+                {% endif %}
+                <td>
+                    {{ match.score }}
+                </td>
+                {% if match.rating > 0 %}
+                    <td style="color: green">
+                        {{ match.rating }}
+                    </td>
+                {% else %}
+                    <td style="color: red">
+                        {{ match.rating }}
+                    </td>
+                {% endif %}
+                <td>
+                    {{ match.date }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

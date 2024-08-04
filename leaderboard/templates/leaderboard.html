@@ -1,0 +1,44 @@
+{% extends 'app.html' %}
+
+{% block app %}
+    <h2>
+        Leaderboard
+    </h2>
+    <hr>
+    <table>
+        <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Rating
+            </th>
+            <th>
+                Winrate
+            </th>
+            <th>
+                Total games
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for player in players %}
+            <tr>
+                <td>
+                    <a href="/leaderboard/{{ player.name }}/">{{ player.name }}</a>
+                </td>
+                <td>
+                    {{ player.rating }}
+                </td>
+                <td>
+                    {{ player.winrate }}
+                </td>
+                <td>
+                    {{ player.total_games }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
