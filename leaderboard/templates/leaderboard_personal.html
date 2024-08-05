@@ -2,7 +2,7 @@
 
 {% block app %}
     <h2>
-        Own profile
+        Profile for {{ profile.name }} {% if profile.name != user.username %}(not yours){% endif %}
     </h2>
     <table>
         <tbody>
@@ -78,9 +78,11 @@
             <th>
                 Date
             </th>
-            <th>
-                Delete
-            </th>
+            {% if profile.name == user.username %}
+                <th>
+                    Delete
+                </th>
+            {% endif %}
         </tr>
         </thead>
         <tbody>
@@ -118,11 +120,13 @@
                 <td>
                     {{ match.date }}
                 </td>
-                <td style="text-align: center">
-                    <button onclick="delete_entry({{ match.db_id }})">
-                        Delete
-                    </button>
-                </td>
+                {% if profile.name == user.username %}
+                    <td style="text-align: center">
+                        <button onclick="delete_entry({{ match.db_id }})">
+                            Delete
+                        </button>
+                    </td>
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>

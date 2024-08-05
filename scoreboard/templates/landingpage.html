@@ -12,7 +12,7 @@
             </h3>
             <form action="/add_score/" method="post">
                 {% csrf_token %}
-                <label for="oponent" style="margin-right: 5px">Oponent: </label>
+                <label for="oponent" style="margin-right: 5px">Opponent: </label>
                 <select id="oponent" name="oponent" style="margin-right: 10px;">
                     {% for name in names %}
                         <option value="{{ name }}">

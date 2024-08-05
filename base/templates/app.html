@@ -43,12 +43,12 @@
         }
     </style>
     <div class="topnav" style="margin-bottom: 10px">
-        <a class="{% if current == 'home' %}active{% endif %}" href="/">Home</a>
+        <a class="{% if current == 'home' %}active{% endif %}" href="/">Home</a class="{% if current == 'home' %}active{% endif %}" >
         <a class="{% if current == 'leaderboard' %}active{% endif %}" href="/leaderboard">Leaderboard</a>
         <a class="{% if current == 'my_profile' %}active{% endif %}" href="/leaderboard/{{ user.username }}">My profile</a>
         <a href="/login/logout/">Logout</a>
     </div>
-    <div id="app" style="margin: 5px">
+    <div id="app" style="margin: 10px">
         {% block app %}
         {% endblock %}
     </div>
