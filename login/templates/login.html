@@ -1,24 +1,26 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block body %}
-    <div style="display: flex; justify-content: center; align-items: center; height: 100%">
+    <div style="display: flex; justify-content: center; align-items: center; height: 100%; background-image: url({% static 'images/LeetPong.png' %}); background-position: center; background-repeat: no-repeat; margin: 0">
         <div style="color: red">
             {{ message }}
         </div>
-        <form method="post" action="/login/">
-            {% csrf_token %}
-            <div>
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username">
-            </div>
-            <div>
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password">
-            </div>
-            <div>
-                Don't have an account yet? You can register <a href="/login/register/">here</a>
-            </div>
-            <button type="submit">Login</button>
-        </form>
+        <div style="background: rgba(200, 200, 200, 0.5); border-radius: 10px; padding: 5px">
+            <form method="post" action="/login/">
+                {% csrf_token %}
+                <div>
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username">
+                </div>
+                <div>
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password">
+                </div>
+                <div>
+                    Don't have an account yet? You can register <a href="/login/register/">here</a>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+        </div>
     </div>
 {% endblock %}
