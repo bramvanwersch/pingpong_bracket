@@ -17,5 +17,8 @@ class Scores(Model):
     date = models.DateTimeField()
 
     @classmethod
-    def get_player_scores(cls, player: User) -> QuerySet["Scores"]:
-        return cls.objects.filter(Q(player1=player) | Q(player2=player))
+    def get_player_scores(cls, player: User, player2: User = None) -> QuerySet["Scores"]:
+        queryset = cls.objects.filter(Q(player1=player) | Q(player2=player))
+        if player2 is None:
+            return queryset
+        return queryset.filter(Q(player1=player2) | Q(player2=player2))

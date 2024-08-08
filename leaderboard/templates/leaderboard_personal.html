@@ -1,9 +1,26 @@
 {% extends 'app.html' %}
 
 {% block app %}
-    <h2>
-        Profile for {{ profile.name }} {% if profile.name != user.username %}(not yours){% endif %}
-    </h2>
+    <div style="display: flex">
+        <div style="flex: 45%">
+            <h2>
+                Profile for {{ profile.name }}
+            </h2>
+        </div>
+        <div style="flex: 10%">
+        </div>
+        <div style="flex: 45%">
+            <label for="compare" style="margin-right: 5px">Compare to: </label>
+            <select id="compare" style="margin-right: 10px;">
+                {% for name in names %}
+                    <option value="{{ name }}">
+                        {{ name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button onclick="compare_func()">Compare</button>
+        </div>
+    </div>
     <table>
         <tbody>
         <tr>
@@ -140,5 +157,11 @@
             }
             window.location = `/leaderboard/delete/${db_id}`
         }
+
+        function compare_func(){
+            let other_user = document.getElementById("compare").value;
+            window.location = '/leaderboard/{{ profile.name }}/' + other_user + "/";
+        }
+
     </script>
 {% endblock %}
