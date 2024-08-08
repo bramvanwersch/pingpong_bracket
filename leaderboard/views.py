@@ -8,7 +8,7 @@ from general_src.base_view import BaseView
 from login.models import UserData
 from login.src.utility import get_player_data
 from scoreboard.models import Scores
-from scoreboard.src.utility import get_rating_data, get_player_rating_data
+from scoreboard.src.utility import get_player_rating_data
 
 
 class LeaderboardView(BaseView):
@@ -28,7 +28,7 @@ class LeaderboardDetailView(BaseView):
     def get(self, request, name: str):
         profile = get_player_data([UserData.objects.get(user__username=name)])[0]
         user = User.objects.get(username=name)
-        matches = get_player_rating_data(list(Scores.objects.filter(player1=user)) + list(Scores.objects.filter(player2=user)), user)
+        matches = sorted(get_player_rating_data(Scores.get_player_scores(user)[:50], user), key=lambda x: x["date"], reverse=True)
         return TemplateResponse(request, "leaderboard_personal.html",
                                 {"profile": profile, "current": "my_profile", "matches": matches})
         # own_profile = get_player_data([UserData.objects.get(user=request.user)])[0]

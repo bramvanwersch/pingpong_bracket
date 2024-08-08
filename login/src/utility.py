@@ -15,7 +15,7 @@ def get_player_data(players: Iterable[UserData]) -> List[Dict[str, str]]:
             else:
                 winrate = 1.0
         rating = round(player.rating, 2)
-        if Scores.objects.filter(player1=player.user).first() is None and Scores.objects.filter(player2=player.user).first() is None:
+        if Scores.get_player_scores(player.user) is None:
             rating = "NA"
         data.append({
             "name": player.user.username,

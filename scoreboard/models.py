@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Model
+from django.db.models import Model, QuerySet, Q
 
 
 class Scores(Model):
@@ -15,3 +15,7 @@ class Scores(Model):
     p1_rate_change = models.FloatField(default=0.0)
     p2_rate_change = models.FloatField(default=0.0)
     date = models.DateTimeField()
+
+    @classmethod
+    def get_player_scores(cls, player: User) -> QuerySet["Scores"]:
+        return cls.objects.filter(Q(player1=player) | Q(player2=player))
