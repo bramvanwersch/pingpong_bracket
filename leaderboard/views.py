@@ -1,3 +1,5 @@
+from typing import Dict, Any
+
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
@@ -12,8 +14,13 @@ from scoreboard.src.utility import get_rating_data, get_player_rating_data
 class LeaderboardView(BaseView):
 
     def get(self, request):
-        player_data = get_player_data(UserData.objects.all().prefetch_related("user").order_by("-rating"))
+        player_data = sorted(get_player_data(UserData.objects.all().prefetch_related("user")), key=self.__sort_rating, reverse=True)
         return TemplateResponse(request, "leaderboard.html", {"players": player_data, "current": "leaderboard"})
+
+    def __sort_rating(self, rating_dct: Dict[str, Any]) -> int:
+        if isinstance(rating_dct["rating"], str):
+            return 0
+        return rating_dct["rating"]
 
 
 class LeaderboardDetailView(BaseView):
