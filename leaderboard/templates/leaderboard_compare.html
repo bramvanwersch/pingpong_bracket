@@ -1,4 +1,5 @@
 {% extends 'app.html' %}
+{% load static %}
 
 {% block app %}
     <div style="display: flex">
@@ -7,7 +8,8 @@
                 Profile of {{ profile.name }}
             </h2>
         </div>
-        <div style="flex: 10%">
+        <div style="flex: 10%; text-align: center">
+            VS
         </div>
         <div style="flex: 45%">
             <h2 style="text-align: center">
@@ -24,7 +26,7 @@
                         Rating:
                     </td>
                     <td>
-                        {{ profile.rating }}
+                        {{ profile.rating_gain }}
                     </td>
                 </tr>
                 <tr>
@@ -71,7 +73,7 @@
             </table>
         </div>
         <div style="flex: 10%; text-align: center">
-            VS
+           <button onclick="window.location = '/leaderboard/{{ other_profile.name }}/{{ profile.name }}/'"><img src="{% static 'icons/arrow-left-right.svg' %}"></button>
         </div>
         <div style="flex: 45%">
             <table>
@@ -81,7 +83,7 @@
                         Rating:
                     </td>
                     <td>
-                        {{ other_profile.rating }}
+                        {{ other_profile.rating_gain }}
                     </td>
                 </tr>
                 <tr>
@@ -129,9 +131,15 @@
         </div>
     </div>
     <hr>
-    <h3>
-        Recent matches of {{ profile.name }}
-    </h3>
+    {% if matches|length == 0 %}
+        <h3 style="color: red">
+            No matches played between {{ profile.name }} and {{ other_profile.name }}
+        </h3>
+    {% else %}
+        <h3>
+            Recent matches of {{ profile.name }} vs {{ other_profile.name }}
+        </h3>
+    {% endif %}
     <table>
         <thead>
         <tr>
