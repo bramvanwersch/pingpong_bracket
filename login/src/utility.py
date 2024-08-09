@@ -17,7 +17,7 @@ def get_player_data(players: Iterable[UserData]) -> List[Dict[str, str]]:
             else:
                 winrate = 1.0
         rating = round(player.rating, 2)
-        if Scores.get_player_scores(player.user) is None:
+        if Scores.get_player_scores(player.user).first() is None:
             rating = "NA"
         data.append({
             "name": player.user.username,
@@ -48,7 +48,7 @@ def get_comparative_player_data(player1: User, player2: User) -> Tuple[Dict[str,
         if score.p1_score > score.p2_score:
             p1_data["wins"] += 1
             p2_data["losses"] += 1
-        elif score.p2_score > score.p2_score:
+        elif score.p2_score > score.p1_score:
             p1_data["losses"] += 1
             p2_data["wins"] += 1
         else:
