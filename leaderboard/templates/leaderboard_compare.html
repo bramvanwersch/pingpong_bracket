@@ -2,10 +2,16 @@
 {% load static %}
 
 {% block app %}
+    <div>
+        <h2>
+            Stats comparison
+        </h2>
+    <hr>
+    </div>
     <div style="display: flex">
         <div style="flex: 45%">
             <h2 style="text-align: center">
-                Profile of {{ profile.name }}
+                Profile of <a href="/leaderboard/{{ profile.name }}">{{ profile.name }}</a>
             </h2>
         </div>
         <div style="flex: 10%; text-align: center">
@@ -13,7 +19,7 @@
         </div>
         <div style="flex: 45%">
             <h2 style="text-align: center">
-                Profile of {{ other_profile.name }}
+                Profile of <a href="/leaderboard/{{ other_profile.name }}">{{ other_profile.name }}</a>
             </h2>
         </div>
     </div>
@@ -21,14 +27,7 @@
         <div style="flex: 45%">
             <table>
                 <tbody>
-                <tr>
-                    <td>
-                        Rating:
-                    </td>
-                    <td>
-                        {{ profile.rating_gain }}
-                    </td>
-                </tr>
+
                 <tr>
                     <td>
                         Wins:
@@ -61,31 +60,33 @@
                         {{ profile.total }}
                     </td>
                 </tr>
-                <tr>
+                <tr style="color: {% if profile.rating_gain > other_profile.rating_gain %}green{% elif profile.rating_gain == other_profile.rating_gain %}orange{% else %}red{% endif %}">
                     <td>
-                        Winrate:
+                        Rating:
                     </td>
                     <td>
-                        {{ profile.winrate }}
+                        {{ profile.rating_gain }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Win percentage:
+                    </td>
+                    <td>
+                        {{ profile.winrate }} %
                     </td>
                 </tr>
                 </tbody>
             </table>
         </div>
         <div style="flex: 10%; text-align: center">
-           <button onclick="window.location = '/leaderboard/{{ other_profile.name }}/{{ profile.name }}/'"><img src="{% static 'icons/arrow-left-right.svg' %}"></button>
+            <button onclick="window.location = '/leaderboard/{{ other_profile.name }}/{{ profile.name }}/'"><img
+                    src="{% static 'icons/arrow-left-right.svg' %}"></button>
         </div>
         <div style="flex: 45%">
             <table>
                 <tbody>
-                <tr>
-                    <td>
-                        Rating:
-                    </td>
-                    <td>
-                        {{ other_profile.rating_gain }}
-                    </td>
-                </tr>
+
                 <tr>
                     <td>
                         Wins:
@@ -118,12 +119,20 @@
                         {{ other_profile.total }}
                     </td>
                 </tr>
-                <tr>
+                <tr style="color: {% if profile.rating_gain > other_profile.rating_gain %}red{% elif profile.rating_gain == other_profile.rating_gain %}orange{% else %}green{% endif %}">
                     <td>
-                        Winrate:
+                        Rating:
                     </td>
                     <td>
-                        {{ other_profile.winrate }}
+                        {{ other_profile.rating_gain }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Win percentage:
+                    </td>
+                    <td>
+                        {{ other_profile.winrate }} %
                     </td>
                 </tr>
                 </tbody>

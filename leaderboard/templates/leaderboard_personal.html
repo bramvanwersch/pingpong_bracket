@@ -23,14 +23,7 @@
     </div>
     <table>
         <tbody>
-        <tr>
-            <td>
-                Rating:
-            </td>
-            <td>
-                {{ profile.rating }}
-            </td>
-        </tr>
+
         <tr>
             <td>
                 Wins:
@@ -65,10 +58,18 @@
         </tr>
         <tr>
             <td>
-                Winrate:
+                Rating:
             </td>
             <td>
-                {{ profile.winrate }}
+                {{ profile.rating }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Win percentage:
+            </td>
+            <td>
+                {{ profile.winrate }} %
             </td>
         </tr>
         </tbody>
@@ -158,7 +159,7 @@
             window.location = `/leaderboard/delete/${db_id}`
         }
 
-        function compare_func(){
+        function compare_func() {
             let other_user = document.getElementById("compare").value;
             window.location = '/leaderboard/{{ profile.name }}/' + other_user + "/";
         }

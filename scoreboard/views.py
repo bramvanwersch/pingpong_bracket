@@ -16,7 +16,7 @@ class LandingPage(BaseView):
     def get(self, request):
         names = {u.username for u in User.objects.all()}
         names.remove(request.user.username)
-        data = get_rating_data(Scores.objects.all().order_by("-date")[:50])
+        data = get_rating_data(Scores.objects.all().order_by("-date")[:25])
         return TemplateResponse(request, "landingpage.html", {"names": list(names), "matches": data, "current": 'home'})
 
 
