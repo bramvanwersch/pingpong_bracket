@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, List, Tuple
 
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
@@ -31,12 +31,25 @@ class LeaderboardDetailView(BaseView):
         matches = sorted(get_player_rating_data(Scores.get_player_scores(user)[:50], user), key=lambda x: x["date"], reverse=True)
         names = {u.username for u in User.objects.all()}
         names.remove(name)
+        ratings, labels = self._get_match_line_data(user)
         if user == request.user:
             current = "my_profile"
         else:
             current = "leaderboard"
         return TemplateResponse(request, "leaderboard_personal.html",
-                                {"profile": profile, "current": current, "matches": matches, "names": names})
+                                {"profile": profile, "current": current, "matches": matches, "names": names, "ratings": ratings, "labels": labels})
+
+    def _get_match_line_data(self, user: User) -> Tuple[List[int], List[str]]:
+        ratings = [1000]
+        labels = []
+        for score in Scores.get_player_scores(user):
+            if score.player1 == user:
+                rating_change = score.p1_rate_change
+            else:
+                rating_change = score.p2_rate_change
+            ratings.append(ratings[-1] + rating_change)
+            labels.append(score.date.strftime("%d/%m/%Y"))
+        return ratings, labels
 
 
 class LeaderboardCompareView(BaseView):

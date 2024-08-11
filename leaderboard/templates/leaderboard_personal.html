@@ -162,6 +162,10 @@
 {% endblock %}
 {% block scripts %}
     <script>
+        $(document).ready(function () {
+            make_graph()
+        });
+
         function delete_entry(db_id) {
             if (!confirm("Are you sure you want to delete this match. The Rating will be refunded")) {
                 return;
@@ -174,30 +178,22 @@
             window.location = '/leaderboard/{{ profile.name }}/' + other_user + "/";
         }
 
-        function make_graph(data) {
-            let canvas = $("#lines");
-            canvas.remove();
-            let container = $("#line-graph-container")
-            container.append("<canvas id='lines'></canvas>")
-            let datasets = []
-            for (const [key, value] of Object.entries(data["datasets"])) {
-                datasets.push({
-                    label: key,
-                    data: value,
-                    borderColor: COLORS[key],
-                    tension: 0.5,
-                    pointRadius: 1,
-                })
-            }
-            new Chart(document.getElementById("lines"), {
+        function make_graph() {
+            new Chart(document.getElementById("rating-progression"), {
                 type: 'line',
                 options: {
                     responsive: true,
                     maintainAspectRatio: false
                 },
                 data: {
-                    labels: data["labels"],
-                    datasets: datasets
+                    labels: {{ labels | safe }},
+                    datasets: [{
+                        label: "Rating",
+                        data: {{ ratings | safe }},
+                        borderColor: "red",
+                        tension: 0.5,
+                        pointRadius: 1,
+                    }]
                 },
             })
         }
