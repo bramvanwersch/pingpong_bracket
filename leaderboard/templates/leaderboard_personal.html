@@ -1,5 +1,8 @@
 {% extends 'app.html' %}
-
+{% load static %}
+{% block js-packages %}
+    <script type="text/javascript" src="{% static "js-packages/chart.js" %}"></script>
+{% endblock %}
 {% block app %}
     <div style="display: flex">
         <div style="flex: 45%">
@@ -21,59 +24,66 @@
             <button onclick="compare_func()">Compare</button>
         </div>
     </div>
-    <table>
-        <tbody>
+    <div style="display: flex">
+        <div style="flex: 50%">
 
-        <tr>
-            <td>
-                Wins:
-            </td>
-            <td>
-                {{ profile.wins }}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Losses:
-            </td>
-            <td>
-                {{ profile.losses }}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Ties:
-            </td>
-            <td>
-                {{ profile.ties }}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Total:
-            </td>
-            <td>
-                {{ profile.total_games }}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Rating:
-            </td>
-            <td>
-                {{ profile.rating }}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Win percentage:
-            </td>
-            <td>
-                {{ profile.winrate }} %
-            </td>
-        </tr>
-        </tbody>
-    </table>
+            <table>
+                <tbody>
+                <tr>
+                    <td>
+                        Wins:
+                    </td>
+                    <td>
+                        {{ profile.wins }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Losses:
+                    </td>
+                    <td>
+                        {{ profile.losses }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Ties:
+                    </td>
+                    <td>
+                        {{ profile.ties }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Total:
+                    </td>
+                    <td>
+                        {{ profile.total_games }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Rating:
+                    </td>
+                    <td>
+                        {{ profile.rating }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Win percentage:
+                    </td>
+                    <td>
+                        {{ profile.winrate }} %
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="flex: 50%">
+            <canvas id="rating-progression"></canvas>
+        </div>
+    </div>
     <hr>
     <h3>
         Recent matches
@@ -162,6 +172,34 @@
         function compare_func() {
             let other_user = document.getElementById("compare").value;
             window.location = '/leaderboard/{{ profile.name }}/' + other_user + "/";
+        }
+
+        function make_graph(data) {
+            let canvas = $("#lines");
+            canvas.remove();
+            let container = $("#line-graph-container")
+            container.append("<canvas id='lines'></canvas>")
+            let datasets = []
+            for (const [key, value] of Object.entries(data["datasets"])) {
+                datasets.push({
+                    label: key,
+                    data: value,
+                    borderColor: COLORS[key],
+                    tension: 0.5,
+                    pointRadius: 1,
+                })
+            }
+            new Chart(document.getElementById("lines"), {
+                type: 'line',
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                },
+                data: {
+                    labels: data["labels"],
+                    datasets: datasets
+                },
+            })
         }
 
     </script>
