@@ -15,10 +15,13 @@
                 Rating
             </th>
             <th>
-               Win percentage
+                Win percentage
             </th>
             <th>
                 Total games
+            </th>
+            <th>
+                Challenge
             </th>
         </tr>
         </thead>
@@ -36,6 +39,11 @@
                 </td>
                 <td>
                     {{ player.total_games }}
+                </td>
+                <td>
+                    <button onclick="window.location = '/matchmaking/challenge/{{ player.name }}'">
+                        Challenge
+                    </button>
                 </td>
             </tr>
         {% endfor %}
