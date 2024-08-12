@@ -1,5 +1,8 @@
 {% extends 'app.html' %}
-
+{% load static %}
+{% block js-packages %}
+    <script type="text/javascript" src="{% static "js-packages/chart.js" %}"></script>
+{% endblock %}
 {% block app %}
     <div style="display: flex">
         <div style="flex: 45%">
@@ -21,58 +24,65 @@
             <button onclick="compare_func()">Compare</button>
         </div>
     </div>
-    <table>
-        <tbody>
-        <tr>
-            <td>
-                Rating:
-            </td>
-            <td>
-                {{ profile.rating }}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Wins:
-            </td>
-            <td>
-                {{ profile.wins }}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Losses:
-            </td>
-            <td>
-                {{ profile.losses }}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Ties:
-            </td>
-            <td>
-                {{ profile.ties }}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Total:
-            </td>
-            <td>
-                {{ profile.total_games }}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Winrate:
-            </td>
-            <td>
-                {{ profile.winrate }}
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <div style="display: flex">
+        <div style="flex: 50%">
+            <table>
+                <tbody>
+                <tr>
+                    <td>
+                        Wins:
+                    </td>
+                    <td>
+                        {{ profile.wins }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Losses:
+                    </td>
+                    <td>
+                        {{ profile.losses }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Ties:
+                    </td>
+                    <td>
+                        {{ profile.ties }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Total:
+                    </td>
+                    <td>
+                        {{ profile.total_games }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Rating:
+                    </td>
+                    <td>
+                        {{ profile.rating }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Win percentage:
+                    </td>
+                    <td>
+                        {{ profile.winrate }} %
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="flex: 50%">
+            <canvas id="rating-progression"></canvas>
+        </div>
+    </div>
     <hr>
     <h3>
         Recent matches
@@ -151,6 +161,10 @@
 {% endblock %}
 {% block scripts %}
     <script>
+        $(document).ready(function () {
+            make_graph()
+        });
+
         function delete_entry(db_id) {
             if (!confirm("Are you sure you want to delete this match. The Rating will be refunded")) {
                 return;
@@ -158,9 +172,29 @@
             window.location = `/leaderboard/delete/${db_id}`
         }
 
-        function compare_func(){
+        function compare_func() {
             let other_user = document.getElementById("compare").value;
             window.location = '/leaderboard/{{ profile.name }}/' + other_user + "/";
+        }
+
+        function make_graph() {
+            new Chart(document.getElementById("rating-progression"), {
+                type: 'line',
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                },
+                data: {
+                    labels: {{ labels | safe }},
+                    datasets: [{
+                        label: "Rating",
+                        data: {{ ratings | safe }},
+                        borderColor: "red",
+                        tension: 0.5,
+                        pointRadius: 1,
+                    }]
+                },
+            })
         }
 
     </script>

@@ -20,5 +20,5 @@ class Scores(Model):
     def get_player_scores(cls, player: User, player2: User = None) -> QuerySet["Scores"]:
         queryset = cls.objects.filter(Q(player1=player) | Q(player2=player))
         if player2 is None:
-            return queryset
-        return queryset.filter(Q(player1=player2) | Q(player2=player2))
+            return queryset.order_by("-date")
+        return queryset.filter(Q(player1=player2) | Q(player2=player2)).order_by("-date")

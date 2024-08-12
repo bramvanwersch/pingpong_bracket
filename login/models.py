@@ -13,6 +13,7 @@ class UserData(Model):
     wins = models.IntegerField(default=0)
     losses = models.IntegerField(default=0)
     ties = models.IntegerField(default=0)
+    email = models.EmailField(default=None, null=True)
 
     @property
     def total(self) -> int:

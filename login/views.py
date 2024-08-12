@@ -38,6 +38,7 @@ class RegisterView(View):
         username = request.POST['username']
         password = request.POST['password']
         password_again = request.POST['password_again']
+        email = request.POST['email']
         if any(v == '' for v in (username, password, password_again)):
             return TemplateResponse(request, "register.html", {"message": "Please fill in all fields"})
         if password_again != password:
@@ -46,5 +47,5 @@ class RegisterView(View):
             new_user = User.objects.create_user(username=username, password=password)
         except Exception:
             return TemplateResponse(request, "register.html", {"message": "Failed to make account, user already exists"})
-        UserData.objects.create(user=new_user)
+        UserData.objects.create(user=new_user, email=email)
         return HttpResponseRedirect('/login/')
