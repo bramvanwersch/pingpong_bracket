@@ -2,28 +2,93 @@
 {% load static %}
 
 {% block body %}
-    <div style="display: flex; justify-content: center; align-items: center; height: 100%; background-image: url({% static 'images/LeetPong.png' %}); background-position: center; background-repeat: no-repeat; margin: 0">
-        <div style="background: rgba(200, 200, 200, 0.5); border-radius: 10px; padding: 5px">
-            <div style="color: red">
-                {{ message }}
+    <link rel="stylesheet" href="{% static "css/signin.css" %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <canvas id='Canvas'></canvas>
+
+    <div class="login-card">
+        <div class="login-card-content">
+            <div class="header">
+                <div>
+                    <img src="{% static 'images/LeetPong.png' %}" alt="Company Logo"
+                         style="width: 250px; height: auto;">
+                </div>
             </div>
-            <form action="/login/register/" method="post">
+
+            <form class="form" method="post" action="/login/register/">
                 {% csrf_token %}
-                <div>
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username">
+                <div class="form-field username">
+                    <div class="icon">
+                        <i class="far fa-user"></i>
+                    </div>
+                    <input type="text" id="username" name="username" placeholder="Username">
+                </div>
+                <div class="form-field password">
+                    <div class="icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <input type="password" id="password" name="password" placeholder="Password">
+                </div>
+                <div class="form-field password">
+                    <div class="icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <input type="password" id="password_again" name="password_again" placeholder="Repeat password">
+                </div>
+                <button type="submit">Sign Up</button>
+                <div style="color: #d61e2d; margin-bottom: 20px">
+                    {{ message }}
                 </div>
                 <div>
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password">
+                    Already have an account? <a href="/login/">Sign In Now</a>
                 </div>
-                <div>
-                    <label for="password_again">Password</label>
-                    <input type="password" id="password_again" name="password_again">
-                </div>
-                <button type="submit">Register</button>
-                <button type="button" style="float: right" onclick="window.location = '/login'">Back</button>
             </form>
         </div>
     </div>
+    <script>
+        var canvas = document.getElementById('Canvas');
+        var ctx = canvas.getContext('2d');
+        var particles = [];
+        var particleCount = 280;
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        for (var i = 0; i < particleCount; i++) {
+            particles.push(new particle());
+        }
+
+        function particle() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.speed = 0.5 + Math.random();
+            this.radius = Math.random() * 3;
+            this.opacity = (Math.random() * 100) / 1000;
+        }
+
+        function loop() {
+            requestAnimationFrame(loop);
+            draw();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.globalCompositeOperation = 'lighter';
+            for (var i = 0; i < particles.length; i++) {
+                var p = particles[i];
+                ctx.beginPath();
+                ctx.fillStyle = 'rgba(255,255,255,' + p.opacity + ')';
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2, false);
+                ctx.fill();
+                p.y -= p.speed;
+                if (p.y <= -p.radius) {
+                    p.y = canvas.height + p.radius;
+                    p.x = Math.random() * canvas.width;
+                }
+            }
+        }
+
+        loop();
+    </script>
 {% endblock %}
