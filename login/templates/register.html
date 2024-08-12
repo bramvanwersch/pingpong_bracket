@@ -24,6 +24,14 @@
                     </div>
                     <input type="text" id="username" name="username" placeholder="Username">
                 </div>
+
+                <div class="form-field username">
+                    <div class="icon">
+                        <i class="far fa-envelope"></i>
+                    </div>
+                    <input type="email" id="email" name="email" placeholder="Email">
+                </div>
+
                 <div class="form-field password">
                     <div class="icon">
                         <i class="fas fa-lock"></i>
@@ -36,19 +44,15 @@
                     </div>
                     <input type="password" id="password_again" name="password_again" placeholder="Repeat password">
                 </div>
+
                 <div>
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email">
-                </div>
-                <div>
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password">
-                <button type="submit">Sign Up</button>
-                <div style="color: #d61e2d; margin-bottom: 20px">
-                    {{ message }}
-                </div>
-                <div>
-                    Already have an account? <a href="/login/">Sign In Now</a>
+                    <button type="submit">Sign Up</button>
+                    <div style="color: #d61e2d; margin-bottom: 20px">
+                        {{ message }}
+                    </div>
+                    <div>
+                        Already have an account? <a href="/login/">Sign In Now</a>
+                    </div>
                 </div>
             </form>
         </div>
