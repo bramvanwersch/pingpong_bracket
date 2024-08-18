@@ -174,7 +174,7 @@
 
         function compare_func() {
             let other_user = document.getElementById("compare").value;
-            window.location = '/leaderboard/{{ profile.name }}/' + other_user + "/";
+            window.location = '/leaderboard/compare/{{ profile.name }}/' + other_user + "/";
         }
 
         function make_graph() {
@@ -191,7 +191,7 @@
                         data: {{ ratings | safe }},
                         borderColor: "red",
                         tension: 0.5,
-                        pointRadius: 1,
+                        pointRadius: 3,
                     }]
                 },
             })

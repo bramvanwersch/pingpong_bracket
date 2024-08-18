@@ -41,8 +41,8 @@ class LeaderboardDetailView(BaseView):
 
     def _get_match_line_data(self, user: User) -> Tuple[List[int], List[str]]:
         ratings = [1000]
-        labels = []
-        for score in Scores.get_player_scores(user):
+        labels = [user.date_joined.strftime("%d/%m/%Y")]
+        for score in Scores.get_player_scores(user).order_by('date'):
             if score.player1 == user:
                 rating_change = score.p1_rate_change
             else:

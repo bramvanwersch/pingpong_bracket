@@ -41,9 +41,11 @@
                     {{ player.total_games }}
                 </td>
                 <td>
-                    <button onclick="window.location = '/matchmaking/challenge/{{ player.name }}'">
-                        Challenge
-                    </button>
+                    {% if user.username != player.name %}
+                        <button onclick="window.location = '/matchmaking/challenge/{{ player.name }}'">
+                            Challenge
+                        </button>
+                    {% endif %}
                 </td>
             </tr>
         {% endfor %}
