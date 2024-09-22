@@ -55,8 +55,8 @@ def get_comparative_player_data(player1: User, player2: User) -> Tuple[Dict[str,
         else:
             p1_data["ties"] += 1
             p2_data["ties"] += 1
-        p1_data["rating_gain"] += match.player_score
-        p2_data["rating_gain"] -= match.player_score
+        p1_data["rating_gain"] += match.rate_change
+        p2_data["rating_gain"] -= match.rate_change
     try:
         p1_data["winrate"] = round(p1_data["wins"] / p1_data["total"], 2) * 100
     except ZeroDivisionError:
