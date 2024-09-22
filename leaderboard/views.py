@@ -7,7 +7,7 @@ from django.template.response import TemplateResponse
 from general_src.base_view import BaseView
 from login.models import UserData
 from login.src.utility import get_player_data, get_comparative_player_data
-from scoreboard.models import Scores
+from scoreboard.models import MatchResult, Result
 from scoreboard.src.utility import get_player_rating_data
 
 
@@ -28,7 +28,7 @@ class LeaderboardDetailView(BaseView):
     def get(self, request, name: str):
         profile = get_player_data([UserData.objects.get(user__username=name)])[0]
         user = User.objects.get(username=name)
-        matches = sorted(get_player_rating_data(Scores.get_player_scores(user)[:50], user), key=lambda x: x["date"], reverse=True)
+        matches = sorted(get_player_rating_data(MatchResult.get_player_scores(user)[:50]), key=lambda x: x["date"], reverse=True)
         names = {u.username for u in User.objects.all()}
         names.remove(name)
         ratings, labels = self._get_match_line_data(user)
@@ -42,12 +42,8 @@ class LeaderboardDetailView(BaseView):
     def _get_match_line_data(self, user: User) -> Tuple[List[int], List[str]]:
         ratings = [1000]
         labels = [user.date_joined.strftime("%d/%m/%Y")]
-        for score in Scores.get_player_scores(user).order_by('date'):
-            if score.player1 == user:
-                rating_change = score.p1_rate_change
-            else:
-                rating_change = score.p2_rate_change
-            ratings.append(ratings[-1] + rating_change)
+        for score in MatchResult.get_player_scores(user).order_by('date'):
+            ratings.append(ratings[-1] + score.rate_change)
             labels.append(score.date.strftime("%d/%m/%Y"))
         return ratings, labels
 
@@ -57,7 +53,7 @@ class LeaderboardCompareView(BaseView):
     def get(self, request, name: str, other_name: str):
         user = User.objects.get(username=name)
         other_user = User.objects.get(username=other_name)
-        matches = sorted(get_player_rating_data(Scores.get_player_scores(user, other_user)[:50], user), key=lambda x: x["date"], reverse=True)
+        matches = sorted(get_player_rating_data(MatchResult.get_player_scores(user, other_user)[:50]), key=lambda x: x["date"], reverse=True)
         profile, other_profile = get_comparative_player_data(user, other_user)
         if user == request.user:
             current = "my_profile"
@@ -70,21 +66,22 @@ class LeaderboardCompareView(BaseView):
 class LeaderboardDeleteView(BaseView):
 
     def get(self, request, db_id: str):
-        score = Scores.objects.get(id=db_id)
-        user_data1 = UserData.objects.get(user=score.player1)
-        user_data2 = UserData.objects.get(user=score.player2)
-        if score.p1_score > score.p2_score:
-            user_data1.wins -= 1
-            user_data2.losses -= 1
-        elif score.p2_score > score.p1_score:
-            user_data1.losses -= 1
-            user_data2.wins -= 1
+        match = MatchResult.objects.get(id=db_id)
+        player = UserData.objects.get(user=match.player)
+        opponent = UserData.objects.get(user=match.opponent)
+        result = match.get_result()
+        if result == Result.WIN:
+            player.wins -= 1
+            opponent.losses -= 1
+        elif result == Result.LOSS:
+            player.losses -= 1
+            opponent.wins -= 1
         else:
-            user_data1.ties -= 1
-            user_data2.ties -= 1
-        user_data1.rating -= score.p1_rate_change
-        user_data2.rating -= score.p2_rate_change
-        user_data1.save()
-        user_data2.save()
-        score.delete()
+            player.ties -= 1
+            opponent.ties -= 1
+        player.rating -= match.rate_change
+        opponent.rating += match.rate_change
+        player.save()
+        opponent.save()
+        MatchResult.objects.filter(match_id=match.match_id).delete()
         return HttpResponseRedirect(f'/leaderboard/{request.user.username}')

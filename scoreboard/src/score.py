@@ -2,33 +2,34 @@ import math
 from typing import Tuple
 
 from login.models import UserData
-from scoreboard.models import Scores
+from scoreboard.models import MatchResult, Result
 from scoreboard.src import constants
 
 
-def record_score(p1_data: UserData, p2_data: UserData, score: Scores):
+def record_score(player: UserData, opponent: UserData, match: MatchResult):
+    """
+    A single score record of the 2 calculates the change in score for both the player and opponent
+    """
     outcome = 0.5
-    p1_score = score.p1_score
-    p2_score = score.p2_score
-    if p1_score > p2_score:
+    result = match.get_result()
+    if result == Result.WIN:
         outcome = 1
-        p1_data.wins += 1
-        p2_data.losses += 1
-    elif p2_score > p1_score:
-        p2_data.wins += 1
-        p1_data.losses += 1
+        player.wins += 1
+        opponent.losses += 1
+    elif result == Result.LOSS:
+        opponent.wins += 1
+        player.losses += 1
         outcome = 0
     else:
-        p1_data.ties += 1
-        p2_data.ties += 1
-    new_rate1, new_rate2 = _elo_rating(p1_data.rating, p2_data.rating, outcome)
-    p1_data.rating += new_rate1
-    p2_data.rating += new_rate2
-    p1_data.save()
-    p2_data.save()
-    score.p1_rate_change = new_rate1
-    score.p2_rate_change = new_rate2
-    score.save()
+        player.ties += 1
+        opponent.ties += 1
+    rate_change_player, rate_change_opponent = _elo_rating(player.rating, opponent.rating, outcome)
+    player.rating += rate_change_player
+    opponent.rating += rate_change_opponent
+    player.save()
+    opponent.save()
+    match.rate_change = rate_change_player
+    match.save()
 
 
 def _elo_rating(rating_a: float, rating_b: float, outcome: float) -> Tuple[float, float]:

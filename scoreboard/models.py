@@ -3,22 +3,36 @@ from django.db import models
 from django.db.models import Model, QuerySet, Q
 
 
-class Scores(Model):
+class Result:
+
+    WIN = 'Win'
+    LOSS = 'Loss'
+    TIE = 'Tie'
+
+
+class MatchResult(Model):
 
     class Meta:
-        db_table = "scores"
+        db_table = "match_result"
 
-    player1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="player1")
-    player2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="player2")
-    p1_score = models.IntegerField()
-    p2_score = models.IntegerField()
-    p1_rate_change = models.FloatField(default=0.0)
-    p2_rate_change = models.FloatField(default=0.0)
+    player = models.ForeignKey(User, on_delete=models.CASCADE, related_name='player')
+    opponent = models.ForeignKey(User, on_delete=models.CASCADE, related_name='opponent')
+    player_score = models.IntegerField()
+    opponents_score = models.IntegerField()
     date = models.DateTimeField()
+    rate_change = models.FloatField()
+    match_id = models.UUIDField()
 
     @classmethod
-    def get_player_scores(cls, player: User, player2: User = None) -> QuerySet["Scores"]:
-        queryset = cls.objects.filter(Q(player1=player) | Q(player2=player))
-        if player2 is None:
+    def get_player_scores(cls, player: User, opponent: User = None) -> QuerySet["MatchResult"]:
+        queryset = cls.objects.filter(player=player)
+        if opponent is None:
             return queryset.order_by("-date")
-        return queryset.filter(Q(player1=player2) | Q(player2=player2)).order_by("-date")
+        return queryset.filter(opponent=opponent).order_by("-date")
+
+    def get_result(self) -> str:
+        if self.player_score > self.opponents_score:
+            return Result.WIN
+        if self.opponents_score > self.player_score:
+            return Result.LOSS
+        return Result.TIE

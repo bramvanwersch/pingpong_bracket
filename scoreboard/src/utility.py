@@ -1,56 +1,46 @@
 from typing import List, Dict, Iterable
 
-from django.contrib.auth.models import User
-
-from scoreboard.models import Scores
+from scoreboard.models import MatchResult, Result
 
 
-def get_rating_data(scores: Iterable[Scores]) -> List[Dict[str, str]]:
+def get_rating_data(matches: Iterable[MatchResult], max_: int = 25) -> List[Dict[str, str]]:
     data = []
-    for score in scores:
-        result = "Tie"
-        if score.p1_score > score.p2_score:
-            result = f"{score.player1.username} Won"
-        elif score.p2_score > score.p1_score:
-            result = f"{score.player2.username} Won"
-        rating = abs(round(score.p1_rate_change, 2))
+    covered = set()
+    for match in matches:
+        if match.match_id in covered:
+            continue
+        covered.add(match.match_id)
+        result = match.get_result()
+        if result == Result.WIN:
+            result = f"{match.player.username} Won"
+        elif result == Result.LOSS:
+            result = f"{match.opponent.username} Won"
+        rating = abs(round(match.rate_change, 2))
         data.append({
-            "player1": score.player1.username,
-            "player2": score.player2.username,
+            "player1": match.player.username,
+            "player2": match.opponent.username,
             "result": result,
-            "score": f"{score.p1_score} : {score.p2_score}",
+            "score": f"{match.player_score} : {match.opponents_score}",
             "rating": rating,
-            "date": score.date.date().isoformat(),
-            "db_id": score.id
+            "date": match.date.date().isoformat(),
+            "db_id": match.id
         })
+        if len(data) >= max_:
+            break
     return data
 
 
-def get_player_rating_data(scores: Iterable[Scores], player: User) -> List[Dict[str, str]]:
+def get_player_rating_data(matches: Iterable[MatchResult]) -> List[Dict[str, str]]:
     data = []
-    for score in scores:
-        result = "Tie"
-        if score.p1_score > score.p2_score:
-            if score.player1 == player:
-                result = f"Win"
-            else:
-                result = "Loss"
-        elif score.p2_score > score.p1_score:
-            if score.player1 == player:
-                result = f"Loss"
-            else:
-                result = "Win"
-        if score.player1 == player:
-            rating = round(score.p1_rate_change, 2)
-        else:
-            rating = -1 * round(score.p1_rate_change, 2)
+    for match in matches:
+        result = match.get_result()
         data.append({
-            "player1": score.player1.username,
-            "player2": score.player2.username,
+            "player1": match.player.username,
+            "player2": match.opponent.username,
             "result": result,
-            "score": f"{score.p1_score} : {score.p2_score}",
-            "rating": rating,
-            "date": score.date.date().isoformat(),
-            "db_id": score.id
+            "score": f"{match.player_score} : {match.opponents_score}",
+            "rating": round(match.rate_change, 2),
+            "date": match.date.date().isoformat(),
+            "db_id": match.id
         })
     return data
