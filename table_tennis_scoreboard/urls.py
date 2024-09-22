@@ -23,4 +23,5 @@ urlpatterns = [
     path('', include('scoreboard.urls')),
     path('leaderboard/', include('leaderboard.urls')),
     path('matchmaking/', include('matchmaking.urls')),
+    path('chatroom/', include('chatting.urls')),
 ]

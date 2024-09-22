@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,12 +25,12 @@ SECRET_KEY = 'django-insecure-+n*9bi6^ox0#wgute6*ez(yqnbaiq2fe*0^0fhr0m5b+dmvgpa
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'base',
     'scoreboard',
     'leaderboard',
-    'matchmaking'
+    'matchmaking',
+    'chatting'
 ]
 
 MIDDLEWARE = [
@@ -71,8 +72,7 @@ TEMPLATES = [
         },
     },
 ]
-
-WSGI_APPLICATION = 'table_tennis_scoreboard.wsgi.application'
+ASGI_APPLICATION = 'table_tennis_scoreboard.asgi.application'
 
 
 # Database
