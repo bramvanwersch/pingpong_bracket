@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block body %}
+
     <style>
         .topnav {
             overflow: hidden;
@@ -42,14 +43,17 @@
             background-color: #dddddd;
         }
     </style>
-    <div class="topnav" style="margin-bottom: 10px">
-        <a class="{% if current == 'home' %}active{% endif %}" href="/">Home</a class="{% if current == 'home' %}active{% endif %}" >
+    <div class="topnav" style="margin-bottom: 10px; height: 50px">
+        <a class="{% if current == 'home' %}active{% endif %}" href="/">Home</a class="{% if current == 'home' %}
+            active{% endif %}" >
         <a class="{% if current == 'leaderboard' %}active{% endif %}" href="/leaderboard">Leaderboard</a>
-        <a class="{% if current == 'my_profile' %}active{% endif %}" href="/leaderboard/{{ user.username }}">My profile</a>
+        <a class="{% if current == 'my_profile' %}active{% endif %}" href="/leaderboard/{{ user.username }}">My
+            profile</a>
         <a class="{% if current == 'matchmaking' %}active{% endif %}" href="/matchmaking">Matchmaking</a>
+        <a class="{% if current == 'chatting' %}active{% endif %}" href="/chatroom/">Chatting</a>
         <a href="/login/logout/">Logout</a>
     </div>
-    <div id="app" style="margin: 10px">
+    <div id="app" style="margin: 10px; height: calc(100% - 70px)">
         {% block app %}
         {% endblock %}
     </div>

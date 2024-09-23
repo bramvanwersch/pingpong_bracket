@@ -137,3 +137,9 @@ LOGIN_URL = "login/"
 LOGOUT_REDIRECT_URL = "login/"
 
 ALLOWED_HOSTS = ['*']
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
+}

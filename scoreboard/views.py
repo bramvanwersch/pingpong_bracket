@@ -18,7 +18,7 @@ class LandingPage(BaseView):
         names = {u.username for u in User.objects.all()}
         names.remove(request.user.username)
         data = get_rating_data(MatchResult.objects.all().order_by("-date"))
-        return TemplateResponse(request, "landingpage.html", {"names": list(names), "matches": data, "current": 'home'})
+        return TemplateResponse(request, "landingpage.html", {"names": sorted(names, key=lambda x: x.lower()), "matches": data, "current": 'home'})
 
 
 class AddScoreView(BaseView):

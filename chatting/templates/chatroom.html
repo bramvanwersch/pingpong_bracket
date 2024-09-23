@@ -1,22 +1,59 @@
 {% extends 'app.html' %}
 
 {% block app %}
-    <div>
-        hello
+    <div style="display: flex; flex-direction: column; height: 100%">
+        <div>
+            <label for="chat_room" style="margin-right: 5px">Choose a chat: </label>
+            <select id="chat_room" name="chatter" style="margin-right: 10px;">
+                <option value="general">
+                    General
+                </option>
+                {% for name in names %}
+                    <option value="{{ name }}">
+                        {{ name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button onclick="connect_to_chat_room()">Connect</button>
+        </div>
+        <div style="flex-grow: 1; border: 2px solid black;border-radius: 5px; margin-bottom: 5px; margin-top: 10px; overflow-y: scroll" id="messages">
+        </div>
+        <div>
+            <div style="display: flex; width: 100%">
+                <input type="text" style="flex-grow: 1" id="message_box"><button>Send</button>
+            </div>
+        </div>
     </div>
 
 {% endblock %}
 {% block scripts %}
     <script>
 
-    let url = `ws://${window.location.host}/ws/socket-server/`;
+        let user = '{{ user.username }}';
 
-    const chatSocket = new WebSocket(url);
+        window.onload = function(){
+            let url = `ws://${window.location.host}/ws/chatting/{{ room_name }}`;
+            let messages = $("#messages");
+            let message_box = $("#message_box")
 
-    chatSocket.onmessage = function (e) {
-      let data = JSON.parse(e.data)
-      console.log('Data: ', data)
-    }
+            const chatSocket = new WebSocket(url);
 
-  </script>
+            chatSocket.onmessage = function (e) {
+                let data = JSON.parse(e.data);
+                messages.prepend(`<div>${data.message}</div>`)
+            }
+
+            message_box.on("keypress", function(event){
+                if (event.originalEvent.key === "Enter"){
+                    chatSocket.send(JSON.stringify({message: message_box[0].value, username: user}));
+                    message_box[0].value = "";
+                }
+            })
+        }
+
+        function connect_to_chat_room() {
+            window.location = "/chatroom/" + $('#chat_room')[0].value;
+        }
+
+    </script>
 {% endblock %}
