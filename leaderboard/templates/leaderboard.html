@@ -8,19 +8,19 @@
     <table>
         <thead>
         <tr>
-            <th>
+            <th style="color: var(--main-color)">
                 Name
             </th>
-            <th>
+            <th style="color: var(--main-color)">
                 Rating
             </th>
-            <th>
+            <th style="color: var(--main-color)">
                 Win percentage
             </th>
-            <th>
+            <th style="color: var(--main-color)">
                 Total games
             </th>
-            <th>
+            <th style="color: var(--main-color)">
                 Challenge
             </th>
         </tr>
@@ -29,7 +29,7 @@
         {% for player in players %}
             <tr>
                 <td>
-                    <a href="/leaderboard/{{ player.name }}/">{{ player.name }}</a>
+                    <a style="color: var(--main-color)" href="/leaderboard/{{ player.name }}/">{{ player.name }}</a>
                 </td>
                 <td>
                     {{ player.rating }}

@@ -1,56 +1,108 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block body %}
-    <style>
-        .topnav {
-            overflow: hidden;
-            background-color: #333;
-        }
+    <link rel="stylesheet" href="{% static "css/template.css" %}">
+    <link rel="stylesheet" href="{% static "css/table.css" %}">
 
-        .topnav a {
-            float: left;
-            color: #f2f2f2;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-            font-size: 17px;
-        }
+    <div class="app-container">
+        <div class="app-header">
+            <div class="app-header-left">
+                <a class="navigation-logo no-hover" href="/">
+                    <div style="margin-top: 5px;">
+                        <img src="{% static 'images/LeetPong.png' %}" alt="Company Logo"
+                             style="width: 70px; height: auto;">
+                    </div>
+                </a>
+                <p class="app-name">LeetPong</p>
+                <div class="search-wrapper">
+                    <input class="search-input" type="text" placeholder="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                         class="bi bi-search" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="app-header-right">
+                <button class="mode-switch" title="Switch Theme">
+                    <svg class="moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                         stroke-width="2" width="24" height="24" viewBox="0 0 24 24">
+                        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+                    </svg>
+                </button>
+                <button class="notification-btn" style="margin-right: 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="feather feather-bell">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    </svg>
+                </button>
+                <a class="profile-btn" href="/leaderboard/{{ user.username }}" style="text-decoration: none;">
+                    <img src="{% static 'images/blank-profile.png' %}">
+                    <span>{{ user.username }}</span>
+                </a>
+                <a href="/login/logout/" class="app-sidebar-link" title="sign out" style="margin-left: 10px">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                         class="bi bi-person-circle" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                              d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
+                        <path fill-rule="evenodd"
+                              d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+        <div class="app-content">
+            <div class="app-sidebar">
+                <a href="/" class="app-sidebar-link {% if current == 'home' %}active{% endif %}" title="Home">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="feather feather-home">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                </a>
+                <a href="/leaderboard" class="app-sidebar-link {% if current == 'leaderboard' %}active{% endif %}"
+                   title="Leaderboard">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                         class="bi bi-trophy" viewBox="0 0 16 16">
+                        <path d="M2.5.5A.5.5 0 0 1 3 0h10a.5.5 0 0 1 .5.5q0 .807-.034 1.536a3 3 0 1 1-1.133 5.89c-.79 1.865-1.878 2.777-2.833 3.011v2.173l1.425.356c.194.048.377.135.537.255L13.3 15.1a.5.5 0 0 1-.3.9H3a.5.5 0 0 1-.3-.9l1.838-1.379c.16-.12.343-.207.537-.255L6.5 13.11v-2.173c-.955-.234-2.043-1.146-2.833-3.012a3 3 0 1 1-1.132-5.89A33 33 0 0 1 2.5.5m.099 2.54a2 2 0 0 0 .72 3.935c-.333-1.05-.588-2.346-.72-3.935m10.083 3.935a2 2 0 0 0 .72-3.935c-.133 1.59-.388 2.885-.72 3.935M3.504 1q.01.775.056 1.469c.13 2.028.457 3.546.87 4.667C5.294 9.48 6.484 10 7 10a.5.5 0 0 1 .5.5v2.61a1 1 0 0 1-.757.97l-1.426.356a.5.5 0 0 0-.179.085L4.5 15h7l-.638-.479a.5.5 0 0 0-.18-.085l-1.425-.356a1 1 0 0 1-.757-.97V10.5A.5.5 0 0 1 9 10c.516 0 1.706-.52 2.57-2.864.413-1.12.74-2.64.87-4.667q.045-.694.056-1.469z"/>
+                    </svg>
+                </a>
+                <a href="/matchmaking" class="app-sidebar-link {% if current == 'matchmaking' %}active{% endif %}"
+                   title="Matchmaking">
+                    <img src="{% static 'images/pingpong.png' %}" alt="Company Logo"
+                         style="width: 30px; height: auto;">
+                </a>
+                <a href="/leaderboard/{{ user.username }}"
+                   class="app-sidebar-link {% if current == 'my_profile' %}active{% endif %}" title="Profile">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                         class="bi bi-person-circle" viewBox="0 0 16 16">
+                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                        <path fill-rule="evenodd"
+                              d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+                    </svg>
+                </a>
 
-        .topnav a:hover {
-            background-color: #ddd;
-            color: black;
-        }
+            </div>
 
-        .topnav a.active {
-            background-color: #5e5e5e;
-            color: white;
-        }
-
-        table {
-            font-family: arial, sans-serif;
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        td, th {
-            border: 1px solid #dddddd;
-            text-align: left;
-            padding: 8px;
-        }
-
-        tr:nth-child(even) {
-            background-color: #dddddd;
-        }
-    </style>
-    <div class="topnav" style="margin-bottom: 10px">
-        <a class="{% if current == 'home' %}active{% endif %}" href="/">Home</a class="{% if current == 'home' %}active{% endif %}" >
-        <a class="{% if current == 'leaderboard' %}active{% endif %}" href="/leaderboard">Leaderboard</a>
-        <a class="{% if current == 'my_profile' %}active{% endif %}" href="/leaderboard/{{ user.username }}">My profile</a>
-        <a class="{% if current == 'matchmaking' %}active{% endif %}" href="/matchmaking">Matchmaking</a>
-        <a href="/login/logout/">Logout</a>
+            <div class="projects-section">
+                {% block app %}
+                {% endblock %}
+            </div>
+        </div>
     </div>
-    <div id="app" style="margin: 10px">
-        {% block app %}
-        {% endblock %}
-    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Thema wisselen
+            var modeSwitch = document.querySelector('.mode-switch');
+            modeSwitch.addEventListener('click', function () {
+                document.documentElement.classList.toggle('dark');
+                modeSwitch.classList.toggle('active');
+            });
+        });
+
+    </script>
 {% endblock %}
+
