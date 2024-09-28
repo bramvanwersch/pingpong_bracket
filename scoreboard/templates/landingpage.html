@@ -2,82 +2,94 @@
 
 {% block app %}
     <div>
-        <h2>
-            Home
-        </h2>
-        <div>
-            <hr>
-            <h3>
-                Add new match results
-            </h3>
-            <form action="/add_score/" method="post">
-                {% csrf_token %}
-                <label for="oponent" style="margin-right: 5px">Opponent: </label>
-                <select id="oponent" name="oponent" style="margin-right: 10px;">
-                    {% for name in names %}
-                        <option value="{{ name }}">
-                            {{ name }}
-                        </option>
-                    {% endfor %}
-                </select>
-                <label for="my_points" style="margin-right: 5px">My score: </label>
-                <input type="number" min="0" id="my_points" placeholder="0" name="my_points" value="0" style="margin-right: 10px;">
-                <label for="oponent_points" style="margin-right: 5px">Opponent score:</label>
-                <input type="number" min="0" id="oponent_points" placeholder="0" name="oponent_points"
-                       value="0" style="margin-right: 10px;">
-                <button type="submit">
-                    Add score
-                </button>
-            </form>
-        </div>
-        <div style="margin-top: 15px;">
-            <hr>
-            <h3>
-                Recent matches
-            </h3>
-            <table>
-                <thead>
-                <tr>
-                    <th>
-                        Match
-                    </th>
-                    <th>
-                        Result
-                    </th>
-                    <th>
-                        Score
-                    </th>
-                    <th>
-                        Rating change
-                    </th>
-                    <th>
-                        Date
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for match in matches %}
+        <!-- Header Section -->
+        <h2 style="color: var(--main-color)">Home</h2>
+        <hr>
+        <!-- Flex container for form and table -->
+        <div style="display: flex; justify-content: flex-start; align-items: center; margin-top: 40px;">
+            <!-- Form Section -->
+
+            <!-- Table Section -->
+            <div style="flex: 2;">
+                <table id="matches_table">
+                    <thead>
                     <tr>
-                        <td>
-                            <a href="/leaderboard/{{ match.player1 }}">{{ match.player1 }}</a> vs <a
-                                href="/leaderboard/{{ match.player2 }}">{{ match.player2 }}</a>
-                        </td>
-                        <td>
-                            {{ match.result }}
-                        </td>
-                        <td>
-                            {{ match.score }}
-                        </td>
-                        <td>
-                            {{ match.rating }}
-                        </td>
-                        <td>
-                            {{ match.date }}
-                        </td>
+                        <th style="color: white;"><span>Match</span></th>
+                        <th style="color: white;"><span>Result</span></th>
+                        <th style="color: white;"><span>Score</span></th>
+                        <th style="color: white;"><span>Rating change</span></th>
+                        <th style="color: white;"><span>Date</span></th>
                     </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {% for match in matches %}
+                        <tr>
+                            <td class="lalign">
+                                <a href="/leaderboard/{{ match.player1 }}"
+                                   style="color:var(--main-color)">{{ match.player1 }}</a> vs
+                                <a href="/leaderboard/{{ match.player2 }}"
+                                   style="color:var(--main-color)">{{ match.player2 }}</a>
+                            </td>
+                            <td>{{ match.result }}</td>
+                            <td>{{ match.score }}</td>
+                            <td>{{ match.rating }}</td>
+                            <td>{{ match.date }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-left: 20px; margin-right: 50px">
+                <h3 style="color: var(--main-color)">Add new match results</h3>
+                <form action="/add_score/" method="post" style="display: flex; flex-direction: column; gap: 10px;">
+                    {% csrf_token %}
+                    <div>
+                        <label for="oponent" style="margin-right: 5px; color: var(--main-color)">Opponent:</label>
+                        <hr>
+                        <select id="oponent" name="oponent">
+                            {% for name in names %}
+                                <option value="{{ name }}">{{ name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="my_points" style="margin-right: 5px; color: var(--main-color)">My score:</label>
+                        <hr>
+                        <input type="number" min="0" id="my_points" placeholder="0" name="my_points" value="0">
+                    </div>
+                    <div>
+                        <label for="oponent_points" style="margin-right: 5px; color: var(--main-color)">Opponent
+                            score:</label>
+                        <hr>
+                        <input type="number" min="0" id="oponent_points" placeholder="0" name="oponent_points"
+                               value="0">
+                    </div>
+                    <div>
+                        {#                        <button type="submit">Add score</button>#}
+                        <span class="button-wrap">
+                            <button type="submit" class="btn-score">Add Score</button>
+                        </span>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var table = $('#matches_table').DataTable({
+                "pageLength": 12,
+                "lengthChange": false,
+                "dom": 'lrtip'
+            });
+            $('.search-input').on('keyup', function () {
+                table.search(this.value).draw();
+            });
+        });
+    </script>
 {% endblock %}
