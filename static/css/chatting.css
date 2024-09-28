@@ -1,0 +1,9 @@
+
+.chat_selector:hover{
+    background: lightgrey;
+}
+
+.selected{
+    background: lightblue;
+    border: var(--main-color) 3px solid !important;
+}

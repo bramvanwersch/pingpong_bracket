@@ -6,7 +6,8 @@
     <title>LeetPong</title>
 </head>
 <body style="height: 100%">
-
+{% block css-app %}{% endblock %}
+{% block css %}{% endblock %}
 {% block body %}{% endblock body %}
 {# Jquery#}
 <script src="{% static 'js-packages/jquery-3.7.1.js' %}" type="text/javascript">
@@ -26,6 +27,7 @@
 <script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 {% block js-packages %}
 {% endblock %}
+{% block styles %}{% endblock %}
 {% block scripts %}{% endblock %}
 </body>
 </html>

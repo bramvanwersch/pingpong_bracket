@@ -1,28 +1,52 @@
 {% extends 'app.html' %}
+{% load static %}
+
+{% block js-packages %}
+    <script src="{% static 'js-packages/select2.full.min.js' %}" type="text/javascript">
+    </script>
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css-package/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/chatting.css' %}">
+{% endblock %}
 
 {% block app %}
-    <div style="display: flex; flex-direction: column; height: 100%">
-        <div>
-            <label for="chat_room" style="margin-right: 5px">Choose a chat: </label>
-            <select id="chat_room" name="chatter" style="margin-right: 10px;">
-                <option value="general">
-                    General
-                </option>
-                {% for name, id in names.items %}
-                    <option value="{{ id }}">
-                        {{ name }}
-                    </option>
-                {% endfor %}
-            </select>
-            <button onclick="connect_to_chat_room()">Connect</button>
+    <div style="display: flex; height: 100%">
+        <div style="width: 30%; height: 100%; word-break: break-word; margin-bottom: 20px">
+            <div style="display: flex; flex-direction: column; margin-right: 10px; height: calc(100% - 20px);">
+                <div style="color: var(--main-color); display: flex; margin-bottom: 10px;">
+                    <select id="chat_room" name="chatter" style="flex-grow: 1" multiple="multiple">
+                        {% for name, id in names.items %}
+                            <option value="{{ id }}">
+                                {{ name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <button onclick="create_chat_room()">Start chatting</button>
+                </div>
+                <div style="flex-grow: 1; border: 2px solid var(--main-color); border-radius: 5px; overflow: auto">
+                    {% for name, id in group_names %}
+                        <div style="padding: 5px; margin: 5px; border: 1px solid var(--main-color); color: var(--main-color); border-radius: 5px; cursor: pointer"
+                             class="chat_selector {% if id == group_id %}selected{% endif %}" onclick="open_chat({{ id }})">
+                            {{ name }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
-        <div style="flex-grow: 1; border: 2px solid black;border-radius: 5px; margin-bottom: 5px; margin-top: 10px; overflow-y: scroll"
-             id="messages">
-        </div>
-        <div>
-            <div style="display: flex; width: 100%">
-                <input type="text" style="flex-grow: 1" id="message_box">
-                <button>Send</button>
+        <div style="width: 70%; margin-bottom: 20px">
+            <div style="display: flex; flex-direction: column; height: 100%;">
+                <h2 id="chat-title" style="text-align: center; color: var(--main-color)">
+                </h2>
+                <div style="flex-grow: 1; border: 2px solid var(--main-color);border-radius: 5px; margin-bottom: 5px; margin-top: 10px; overflow-y: auto; display: flex; flex-direction: column-reverse"
+                     id="messages_div">
+                </div>
+                <div>
+                    <div style="display: flex; width: 100%">
+                        <input type="text" style="flex-grow: 1" id="message_box" autofocus>
+                        <button onclick="send_message()">Send</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -31,30 +55,85 @@
 {% block scripts %}
     <script>
 
-        let user = '{{ user.username }}';
+        let user_id = '{{ user.pk }}';
+        let messages_div = null;
+        let message_box = null;
+        let messages = {{ messages | safe }}
+        let group_id = '{{ group_id }}';
+        let chatSocket = null;
+        let group_name = "No chat selected";
+        let disable_all = true;
+        {% if group_names %}
+            for (let group of {{ group_names | safe }}) {
+                if (group[1] === group_id) {
+                    group_name = group[0];
+                    disable_all = false;
+                    break;
+                }
+            }
+        {% endif %}
 
         window.onload = function () {
-            let url = `ws://${window.location.host}/ws/chatting/{{ room_name }}`;
-            let messages = $("#messages");
-            let message_box = $("#message_box")
+            messages_div = $("#messages_div");
+            message_box = $("#message_box");
+            if (disable_all){
+                message_box.prop('disabled', true);
+            }
+            $("#chat-title").html(group_name);
+            instantiate_websocket();
+            for (let message of messages) {
+                add_message(message);
+            }
 
-            const chatSocket = new WebSocket(url);
+            $('#chat_room').select2({
+                placeholder: "Choose one or more people"
+            });
+        }
+
+        function instantiate_websocket() {
+            if (!group_id) {
+                return
+            }
+            let url = `ws://${window.location.host}/ws/chatting/${group_id}`;
+
+            chatSocket = new WebSocket(url);
 
             chatSocket.onmessage = function (e) {
                 let data = JSON.parse(e.data);
-                messages.prepend(`<div>${data.message}</div>`)
+                add_message(data);
             }
 
             message_box.on("keypress", function (event) {
                 if (event.originalEvent.key === "Enter") {
-                    chatSocket.send(JSON.stringify({message: message_box[0].value, username: user}));
-                    message_box[0].value = "";
+                    send_message();
                 }
             })
         }
 
-        function connect_to_chat_room() {
-            window.location = "/chatroom/" + $('#chat_room')[0].value;
+        function send_message() {
+            chatSocket.send(JSON.stringify({
+                message: message_box[0].value,
+                user_id: user_id,
+                group_id: group_id
+            }));
+            message_box[0].value = "";
+        }
+
+        function add_message(message_data) {
+            messages_div.prepend(`<div style='word-wrap: break-word; color: var(--main-color)'><b><a href='/leaderboard/${message_data.username}' style="color: var(--main-color)">${message_data.username}</a> (${message_data.date})</b>: ${message_data.message}</div>`)
+        }
+
+        function create_chat_room() {
+            let val = $('#chat_room').val();
+            let members = val.join(';');
+            if (!members) {
+                return;
+            }
+            window.location = "/chatroom/new/" + members;
+        }
+
+        function open_chat(group_id) {
+            window.location = `/chatroom/${group_id}`;
         }
 
     </script>

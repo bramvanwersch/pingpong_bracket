@@ -1,22 +1,20 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Model, QuerySet, Q
+from django.db.models import Model, QuerySet
 
 
 class Result:
-
-    WIN = 'Win'
-    LOSS = 'Loss'
-    TIE = 'Tie'
+    WIN = "Win"
+    LOSS = "Loss"
+    TIE = "Tie"
 
 
 class MatchResult(Model):
-
     class Meta:
         db_table = "match_result"
 
-    player = models.ForeignKey(User, on_delete=models.CASCADE, related_name='player')
-    opponent = models.ForeignKey(User, on_delete=models.CASCADE, related_name='opponent')
+    player = models.ForeignKey(User, on_delete=models.CASCADE, related_name="player")
+    opponent = models.ForeignKey(User, on_delete=models.CASCADE, related_name="opponent")
     player_score = models.IntegerField()
     opponents_score = models.IntegerField()
     date = models.DateTimeField()

@@ -16,9 +16,11 @@ from django.core.asgi import get_asgi_application
 
 from websocket_routes.routes import websocket_urlpatterns
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'table_tennis_scoreboard.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "table_tennis_scoreboard.settings")
 
-application = ProtocolTypeRouter({
-    'http': get_asgi_application(),
-    "websocket": AllowedHostsOriginValidator(AuthMiddlewareStack(URLRouter(websocket_urlpatterns))),
-})
+application = ProtocolTypeRouter(
+    {
+        "http": get_asgi_application(),
+        "websocket": AllowedHostsOriginValidator(AuthMiddlewareStack(URLRouter(websocket_urlpatterns))),
+    }
+)

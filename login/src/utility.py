@@ -1,4 +1,4 @@
-from typing import List, Dict, Iterable, Tuple, Union
+from typing import Dict, Iterable, List, Tuple, Union
 
 from django.contrib.auth.models import User
 
@@ -19,19 +19,23 @@ def get_player_data(players: Iterable[UserData]) -> List[Dict[str, str]]:
         rating = round(player.rating, 2)
         if MatchResult.get_player_scores(player.user).first() is None:
             rating = "NA"
-        data.append({
-            "name": player.user.username,
-            "rating": rating,
-            "wins": player.wins,
-            "losses": player.losses,
-            "ties": player.ties,
-            "winrate": winrate,
-            "total_games": player.total
-        })
+        data.append(
+            {
+                "name": player.user.username,
+                "rating": rating,
+                "wins": player.wins,
+                "losses": player.losses,
+                "ties": player.ties,
+                "winrate": winrate,
+                "total_games": player.total,
+            }
+        )
     return data
 
 
-def get_comparative_player_data(player1: User, player2: User) -> Tuple[Dict[str, Union[int, float]], Dict[str, Union[int, float]]]:
+def get_comparative_player_data(
+    player1: User, player2: User
+) -> Tuple[Dict[str, Union[int, float]], Dict[str, Union[int, float]]]:
     matches = MatchResult.get_player_scores(player1, player2)
     p1_data = {
         "name": player1.username,
@@ -40,7 +44,7 @@ def get_comparative_player_data(player1: User, player2: User) -> Tuple[Dict[str,
         "losses": 0,
         "ties": 0,
         "total": len(matches),
-        "winrate": 0
+        "winrate": 0,
     }
     p2_data = {key: value for key, value in p1_data.items()}
     p2_data["name"] = player2.username

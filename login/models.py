@@ -4,7 +4,6 @@ from django.db.models import Model
 
 
 class UserData(Model):
-
     class Meta:
         db_table = "user_data"
 
