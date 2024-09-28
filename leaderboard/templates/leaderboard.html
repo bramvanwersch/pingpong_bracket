@@ -42,7 +42,7 @@
                 </td>
                 <td>
                     {% if user.username != player.name %}
-                        <button onclick="window.location = '/matchmaking/challenge/{{ player.name }}'">
+                        <button onclick="window.location = '/chatroom/send_challenge/{{ player.name }}'">
                             Challenge
                         </button>
                     {% endif %}

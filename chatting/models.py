@@ -1,3 +1,4 @@
+import hashlib
 from typing import List
 
 from django.contrib.auth.models import User
@@ -12,12 +13,14 @@ class ChatGroup(models.Model):
     users = models.ManyToManyField(User, related_name="users", through="chatting.ChatGroupUser")
     name = models.CharField(max_length=128)
     # this id identifies who is in the group --> as to not create double groups
-    group_composition_id = models.IntegerField()
+    group_composition_id = models.BigIntegerField()
 
     @classmethod
     def create_or_get_group(cls, creator: User, other_users: List[User]) -> "ChatGroup":
-        name = f"Chat with {', '.join(sorted(u.username for u in other_users))}"
-        composition_id = hash(name)
+        other_users.append(creator)
+        usernames = sorted(u.username for u in other_users)
+        name = f"Chat between {', '.join(usernames[:-1])} and {usernames[-1]}"
+        composition_id = int(hashlib.md5(name.encode()).hexdigest(), 16) % 1_000_000_000_000
         existing_group = ChatGroup.objects.filter(group_composition_id=composition_id).first()
         if existing_group is not None:
             return existing_group

@@ -1,11 +1,10 @@
 import json
-from datetime import datetime
 
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth.models import User
 
-from chatting.models import ChatGroupUser, ChatMessage, UserMessage
+from chatting.src import utility
 
 GENERAL_SESSION = "general"
 
@@ -28,16 +27,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = text_data_json["message"]
         user_id = text_data_json["user_id"]
         group = text_data_json["group_id"]
-        chat_message = await self._create_chat_message(message, user_id, group)
-        await self.channel_layer.group_send(
-            self.session_id,
-            {
-                "type": "send_message",
-                "message": chat_message.message,
-                "username": chat_message.sender.username,
-                "date": chat_message.date.strftime("%Y-%m-%d %H:%M:%S"),
-            },
-        )
+        await self._create_chat_message(message, user_id, group)
 
     async def send_message(self, event):
         message = event["message"]
@@ -46,16 +36,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({"message": message, "username": username, "date": date}))
 
     @database_sync_to_async
-    def _create_chat_message(self, message: str, sender: str, group_id: str) -> ChatMessage:
+    def _create_chat_message(self, message: str, sender: str, group_id: str):
         sender = User.objects.get(pk=sender)
-        other_users = [cgu.user_id for cgu in ChatGroupUser.objects.filter(group_id=group_id)]
-        chat_message = ChatMessage.objects.create(
-            message=message, sender=sender, date=datetime.now(), chat_group_id=group_id
-        )
-        if self.session_id == GENERAL_SESSION:
-            pass
-        else:
-            UserMessage.objects.create(message=chat_message, message_read=True, user=sender)
-            for user_id in other_users:
-                UserMessage.objects.create(message=chat_message, message_read=True, user_id=user_id)
-        return chat_message
+        utility.send_message(message, sender, group_id)

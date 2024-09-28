@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     "base",
     "scoreboard",
     "leaderboard",
-    "matchmaking",
     "chatting",
 ]
 
