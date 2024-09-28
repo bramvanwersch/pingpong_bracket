@@ -8,19 +8,21 @@
                 <option value="general">
                     General
                 </option>
-                {% for name in names %}
-                    <option value="{{ name }}">
+                {% for name, id in names.items %}
+                    <option value="{{ id }}">
                         {{ name }}
                     </option>
                 {% endfor %}
             </select>
             <button onclick="connect_to_chat_room()">Connect</button>
         </div>
-        <div style="flex-grow: 1; border: 2px solid black;border-radius: 5px; margin-bottom: 5px; margin-top: 10px; overflow-y: scroll" id="messages">
+        <div style="flex-grow: 1; border: 2px solid black;border-radius: 5px; margin-bottom: 5px; margin-top: 10px; overflow-y: scroll"
+             id="messages">
         </div>
         <div>
             <div style="display: flex; width: 100%">
-                <input type="text" style="flex-grow: 1" id="message_box"><button>Send</button>
+                <input type="text" style="flex-grow: 1" id="message_box">
+                <button>Send</button>
             </div>
         </div>
     </div>
@@ -31,7 +33,7 @@
 
         let user = '{{ user.username }}';
 
-        window.onload = function(){
+        window.onload = function () {
             let url = `ws://${window.location.host}/ws/chatting/{{ room_name }}`;
             let messages = $("#messages");
             let message_box = $("#message_box")
@@ -43,8 +45,8 @@
                 messages.prepend(`<div>${data.message}</div>`)
             }
 
-            message_box.on("keypress", function(event){
-                if (event.originalEvent.key === "Enter"){
+            message_box.on("keypress", function (event) {
+                if (event.originalEvent.key === "Enter") {
                     chatSocket.send(JSON.stringify({message: message_box[0].value, username: user}));
                     message_box[0].value = "";
                 }
