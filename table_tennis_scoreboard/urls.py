@@ -24,4 +24,5 @@ urlpatterns = [
     path("leaderboard/", include("leaderboard.urls")),
     path("chatroom/", include("chatting.urls")),
     path("api/", include("api.urls")),
+    path("tournament/", include("tournaments.urls")),
 ]
