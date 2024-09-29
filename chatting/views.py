@@ -2,17 +2,21 @@ from django.contrib.auth.models import User
 from django.db.models.functions import Lower
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
-from django.views import View
 
-from chatting.models import ChatGroup, ChatMessage
+from chatting.models import ChatGroup, ChatMessage, UserMessage
 from chatting.src import utility
+from general_src.base_view import BaseView
 
 
-class ChatRoomView(View):
+class ChatRoomView(BaseView):
     def get(self, request, group_id: int = None):
         names = utility.get_user_mapping([request.user])
-        group_names = utility.get_group_mapping(request.user)
+        group_data = utility.get_group_data(request.user)
         messages = ChatMessage.objects.filter(chat_group_id=group_id).order_by("date")
+        # read all the messages when opening a chat
+        UserMessage.objects.filter(message__chat_group_id=group_id, user=request.user, message_read=False).update(
+            message_read=True
+        )
         formatted_messages = []
         for message in messages:
             formatted_messages.append(
@@ -29,13 +33,13 @@ class ChatRoomView(View):
                 "current": "chatting",
                 "names": names,
                 "group_id": group_id,
-                "group_names": group_names,
+                "group_data": group_data,
                 "messages": formatted_messages,
             },
         )
 
 
-class NewChatRoomView(View):
+class NewChatRoomView(BaseView):
     def get(self, request, user_ids):
         ids = user_ids.split(";")
         users = User.objects.filter(pk__in=ids).order_by(Lower("username"))
@@ -43,7 +47,7 @@ class NewChatRoomView(View):
         return redirect(f"/chatroom/{group.pk}")
 
 
-class ChatChallengeView(View):
+class ChatChallengeView(BaseView):
     def get(self, request, user_name: str):
         challenge_user = User.objects.get(username=user_name)
         group = ChatGroup.create_or_get_group(request.user, [challenge_user])

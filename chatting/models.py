@@ -25,7 +25,6 @@ class ChatGroup(models.Model):
         if existing_group is not None:
             return existing_group
         group = ChatGroup.objects.create(creator=creator, name=name[:128], group_composition_id=composition_id)
-        ChatGroupUser.objects.create(user_id=creator.id, group_id=group.pk)
         for user in other_users:
             ChatGroupUser.objects.create(user_id=user.id, group_id=group.pk)
         return group
@@ -57,3 +56,6 @@ class UserMessage(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.ForeignKey(ChatMessage, on_delete=models.CASCADE)
     message_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"<User: {self.user.username}, Message: {self.message}, ID: {self.pk}>"

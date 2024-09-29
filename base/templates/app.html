@@ -32,14 +32,19 @@
                         <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
                     </svg>
                 </button>
-                <button class="notification-btn" style="margin-right: 10px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                         class="feather feather-bell">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                    </svg>
-                </button>
+                <div style="position: relative">
+                    <a class="notification-btn" style="margin-right: 10px;" href="/chatroom/">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                             class="feather feather-bell">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                        </svg>
+                    </a>
+                    <div class="numberCircle" id="notification-nr" style="position: absolute; top: -7px; right: 0">
+                        0
+                    </div>
+                </div>
                 <a class="profile-btn" href="/leaderboard/{{ user.username }}" style="text-decoration: none;">
                     <img src="{% static 'images/blank-profile.png' %}">
                     <span>{{ user.username }}</span>
@@ -95,6 +100,7 @@
         </div>
     </div>
     <script>
+
         document.addEventListener('DOMContentLoaded', function () {
             // Thema wisselen
             let modeSwitch = document.querySelector('.mode-switch');
@@ -103,10 +109,28 @@
                 modeSwitch.classList.toggle('active');
                 Cookies.set('darkmode', document.documentElement.classList.contains('dark'), {sameSite: 'strict'});
             });
+            
+            // remember dark mode
             if (Cookies.get('darkmode') === 'true') {
                 document.documentElement.classList.add('dark');
                 modeSwitch.classList.add('active');
             }
+
+            // number notifications
+            $.ajax({
+                url: "/api/chatting/get_nr_messages",
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    let nr_messages = data["nr_unread"];
+                    let nr = $("#notification-nr")
+                    nr.html(nr_messages);
+                    if (nr_messages > 0){
+                        nr.css("background", "#d36969")
+
+                    }
+                }
+            });
         });
 
     </script>

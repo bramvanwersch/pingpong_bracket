@@ -25,10 +25,17 @@
                     <button onclick="create_chat_room()">Start chatting</button>
                 </div>
                 <div style="flex-grow: 1; border: 2px solid var(--main-color); border-radius: 5px; overflow: auto">
-                    {% for name, id in group_names.items %}
-                        <div style="padding: 5px; margin: 5px; border: 1px solid var(--main-color); color: var(--main-color); border-radius: 5px; cursor: pointer"
-                             class="chat_selector {% if id == group_id %}selected{% endif %}" onclick="open_chat({{ id }})">
-                            {{ name }}
+                    {% for data in group_data %}
+                        <div style="padding: 5px; margin: 5px; border: 1px solid var(--main-color); color: var(--main-color); border-radius: 5px; cursor: pointer; position: relative"
+                             class="chat_selector {% if data.db_id == group_id %}selected{% endif %}"
+                             onclick="open_chat({{ data.db_id }})">
+                            {{ data.name }}
+                            {% if data.nr_unread > 0 %}
+                                <div class="numberCircle" id="notification-nr"
+                                     style="position: absolute; top: 2px; right: 2px; color: grey">
+                                    {{  data.nr_unread }}
+                                </div>
+                            {% endif %}
                         </div>
                     {% endfor %}
                 </div>
@@ -63,10 +70,10 @@
         let chatSocket = null;
         let group_name = "No chat selected";
         let disable_all = true;
-        {% if group_names %}
-            for (let [name, id] of Object.entries({{ group_names | safe }})) {
-                if (id === group_id) {
-                    group_name = name;
+        {% if group_data %}
+            for (let data of {{ group_data | safe }}) {
+                if (data.db_id === group_id) {
+                    group_name = data.name;
                     disable_all = false;
                     break;
                 }
@@ -76,7 +83,7 @@
         window.onload = function () {
             messages_div = $("#messages_div");
             message_box = $("#message_box");
-            if (disable_all){
+            if (disable_all) {
                 message_box.prop('disabled', true);
             }
             $("#chat-title").html(group_name);
