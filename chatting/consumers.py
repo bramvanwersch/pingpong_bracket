@@ -38,5 +38,4 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def _create_chat_message(self, message: str, sender: str, group_id: str):
         sender = User.objects.get(pk=sender)
-        print("we are here")
         utility.send_message(message, sender, group_id)

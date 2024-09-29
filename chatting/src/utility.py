@@ -31,8 +31,6 @@ def get_group_data(requesting_user: User) -> List[Dict[str, str]]:
         nr_unread = UserMessage.objects.filter(
             message__chat_group=user_group.group, user=requesting_user, message_read=False
         )
-        print(nr_unread)
-        # print(user_group.group.name, nr_unread
         nr_unread = nr_unread.count()
         group_data.append({"name": user_group.group.name, "db_id": f"{user_group.group.pk}", "nr_unread": nr_unread})
     return group_data
@@ -41,7 +39,6 @@ def get_group_data(requesting_user: User) -> List[Dict[str, str]]:
 def send_message(message: str, sender: User, group_id: str):
     # also through the websocket
     other_users = [cgu.user_id for cgu in ChatGroupUser.objects.filter(group_id=group_id)]
-    print(other_users)
     chat_message = ChatMessage.objects.create(
         message=message, sender=sender, date=datetime.now(), chat_group_id=group_id
     )
