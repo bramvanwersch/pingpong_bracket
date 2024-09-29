@@ -118,8 +118,12 @@
         }
 
         function send_message() {
+            let message = message_box[0].value;
+            if (message === ''){
+                return;
+            }
             chatSocket.send(JSON.stringify({
-                message: message_box[0].value,
+                message: message,
                 user_id: user_id,
                 group_id: group_id
             }));
