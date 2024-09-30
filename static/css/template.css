@@ -207,7 +207,6 @@ button, a {
   display: flex;
   align-items: center;
   padding-left: 12px;
-  border-left: 2px solid #ddd;
 }
 
 .profile-btn img {
