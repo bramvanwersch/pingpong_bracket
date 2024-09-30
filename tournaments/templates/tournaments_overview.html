@@ -5,8 +5,36 @@
     <div>
         Here go the tournaments
     </div>
+    <div style="height: 100%" id="canvas-parent">
+        <canvas id="tournament-display" height="500" width="500">
+
+        </canvas>
+    </div>
 {% endblock %}
 {% block scripts %}
     <script>
+        let CANVAS = null;
+        let CONTEXT = null;
+        let CANVAS_PARENT = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            CANVAS = document.getElementById("tournament-display");
+            CONTEXT = CANVAS.getContext("2d");
+            CANVAS_PARENT = document.getElementById("canvas-parent");
+            loop();
+        })
+
+        function loop() {
+            CANVAS.width = CANVAS_PARENT.clientWidth;
+            CANVAS.height = CANVAS_PARENT.clientHeight;
+            draw_bracket();
+            requestAnimationFrame(loop)
+        }
+
+        function draw_bracket() {
+            CONTEXT.rect(10, 10, 100, 100);
+            CONTEXT.stroke()
+        }
+
     </script>
 {% endblock %}
