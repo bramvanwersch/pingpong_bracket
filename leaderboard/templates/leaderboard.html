@@ -1,26 +1,26 @@
 {% extends 'app.html' %}
 
 {% block app %}
-    <h2>
+    <h2 style="color: var(--main-color)">
         Leaderboard
     </h2>
     <hr>
-    <table>
+    <table id="leaderboard_table">
         <thead>
         <tr>
-            <th style="color: var(--main-color)">
+            <th style="color: white;">
                 Name
             </th>
-            <th style="color: var(--main-color)">
+            <th style="color: white;">
                 Rating
             </th>
-            <th style="color: var(--main-color)">
+            <th style="color: white;">
                 Win percentage
             </th>
-            <th style="color: var(--main-color)">
+            <th style="color: white;">
                 Total games
             </th>
-            <th style="color: var(--main-color)">
+            <th style="color: white;">
                 Challenge
             </th>
         </tr>
@@ -51,4 +51,19 @@
         {% endfor %}
         </tbody>
     </table>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var table = $('#leaderboard_table').DataTable({
+                "pageLength": 12,
+                "lengthChange": false,
+                "dom": 'lrtip'
+            });
+            $('.search-input').on('keyup', function () {
+                table.search(this.value).draw();
+            });
+        });
+    </script>
 {% endblock %}

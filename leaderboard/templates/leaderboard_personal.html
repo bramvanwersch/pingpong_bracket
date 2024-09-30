@@ -6,14 +6,14 @@
 {% block app %}
     <div style="display: flex">
         <div style="flex: 45%">
-            <h2>
+            <h2 style="color: var(--main-color)">
                 Profile for {{ profile.name }}
             </h2>
         </div>
         <div style="flex: 10%">
         </div>
         <div style="flex: 45%">
-            <label for="compare" style="margin-right: 5px">Compare to: </label>
+            <label for="compare" style="margin-right: 5px; color: var(--main-color)">Compare to: </label>
             <select id="compare" style="margin-right: 10px;">
                 {% for name in names %}
                     <option value="{{ name }}">
@@ -84,29 +84,29 @@
         </div>
     </div>
     <hr>
-    <h3>
+    <h3 style="color: var(--main-color)">
         Recent matches
     </h3>
-    <table>
+    <table id="leaderboard_personal_table">
         <thead>
         <tr>
-            <th>
+            <th style="color: white;">
                 Match
             </th>
-            <th>
+            <th style="color: white;">
                 Result
             </th>
-            <th>
+            <th style="color: white;">
                 Score
             </th>
-            <th>
+            <th style="color: white;">
                 Rating change
             </th>
-            <th>
+            <th style="color: white;">
                 Date
             </th>
             {% if profile.name == user.username %}
-                <th>
+                <th style="color: white;">
                     Delete
                 </th>
             {% endif %}
@@ -116,8 +116,9 @@
         {% for match in matches %}
             <tr>
                 <td>
-                    <a href="/leaderboard/{{ match.player1 }}">{{ match.player1 }}</a> vs <a
-                        href="/leaderboard/{{ match.player2 }}">{{ match.player2 }}</a>
+                    <a style="color: var(--main-color)" href="/leaderboard/{{ match.player1 }}">{{ match.player1 }}</a>
+                    vs <a
+                        style="color: var(--main-color)" href="/leaderboard/{{ match.player2 }}">{{ match.player2 }}</a>
                 </td>
                 {% if match.result == 'Win' %}
                     <td style="color: green">
@@ -148,7 +149,7 @@
                     {{ match.date }}
                 </td>
                 {% if profile.name == user.username %}
-                    <td style="text-align: center">
+                    <td>
                         <button onclick="delete_entry({{ match.db_id }})">
                             Delete
                         </button>
@@ -161,6 +162,16 @@
 {% endblock %}
 {% block scripts %}
     <script>
+        $(document).ready(function () {
+            var table = $('#leaderboard_personal_table').DataTable({
+                "pageLength": 7,
+                "lengthChange": false,
+                "dom": 'lrtip'
+            });
+            $('.search-input').on('keyup', function () {
+                table.search(this.value).draw();
+            });
+        });
         $(document).ready(function () {
             make_graph()
         });
