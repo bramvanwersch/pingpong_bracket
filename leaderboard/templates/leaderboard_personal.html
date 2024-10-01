@@ -166,13 +166,12 @@
             var table = $('#leaderboard_personal_table').DataTable({
                 "pageLength": 7,
                 "lengthChange": false,
+                "order": [],
                 "dom": 'lrtip'
             });
             $('.search-input').on('keyup', function () {
                 table.search(this.value).draw();
             });
-        });
-        $(document).ready(function () {
             make_graph()
         });
 

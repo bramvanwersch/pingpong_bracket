@@ -6,7 +6,7 @@
         <h2>
             Stats comparison
         </h2>
-    <hr>
+        <hr>
     </div>
     <div style="display: flex">
         <div style="flex: 45%">
@@ -149,22 +149,22 @@
             Recent matches of {{ profile.name }} vs {{ other_profile.name }}
         </h3>
     {% endif %}
-    <table>
+    <table id="compare_match_table">
         <thead>
         <tr>
-            <th>
+            <th style="color: white;">
                 Match
             </th>
-            <th>
+            <th style="color: white;">
                 Result
             </th>
-            <th>
+            <th style="color: white;">
                 Score
             </th>
-            <th>
+            <th style="color: white;">
                 Rating change
             </th>
-            <th>
+            <th style="color: white;">
                 Date
             </th>
 
@@ -209,4 +209,19 @@
         {% endfor %}
         </tbody>
     </table>
+{% endblock %}
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            var table = $('#compare_match_table').DataTable({
+                "pageLength": 7,
+                "lengthChange": false,
+                "order": [],
+                "dom": 'lrtip'
+            });
+            $('.search-input').on('keyup', function () {
+                table.search(this.value).draw();
+            });
+        });
+    </script>
 {% endblock %}

@@ -52,7 +52,6 @@ html, body {
 
 body {
   font-family: 'DM Sans', sans-serif;
-  overflow: hidden;
   display: flex;
   justify-content: center;
   background-color: var(--app-container);
@@ -79,7 +78,6 @@ button, a {
 .app-content {
   display: flex;
   height: 100%;
-  overflow: hidden;
   padding: 10px 24px 24px 0;
 }
 
