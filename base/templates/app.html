@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 <a class="profile-btn" href="/leaderboard/{{ user.username }}" style="text-decoration: none;">
-                    <img src="{% static 'images/blank-profile.png' %}">
+                <img src="/static/images/blank-profile.png" style="border-radius: 50%" id="profile_picture">
                     <span>{{ user.username }}</span>
                 </a>
                 <a href="/login/logout/" class="app-sidebar-link" title="sign out" style="margin-left: 10px">
@@ -125,10 +125,20 @@
                     let nr_messages = data["nr_unread"];
                     let nr = $("#notification-nr")
                     nr.html(nr_messages);
-                    if (nr_messages > 0){
+                    if (nr_messages > 0) {
                         nr.css("background", "#d36969")
 
                     }
+                }
+            });
+
+            $.ajax({
+                url: "/api/login/get_image",
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    let image = document.getElementById("profile_picture");
+                    image.src = data.url;
                 }
             });
         });

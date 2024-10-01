@@ -280,8 +280,11 @@
 
         function loadFile() {
             let image = document.getElementById("output");
+            let profile_picture = document.getElementById("profile_picture");
             let file_input = $("#file")
-            image.src = URL.createObjectURL(file_input[0].files[0]);
+            let url = URL.createObjectURL(file_input[0].files[0]);
+            image.src = url;
+            profile_picture.src = url;
             let formData = new FormData();
             formData.append('file', file_input[0].files[0]);
 
