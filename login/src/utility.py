@@ -28,6 +28,7 @@ def get_player_data(players: Iterable[UserData]) -> List[Dict[str, str]]:
                 "ties": player.ties,
                 "winrate": winrate,
                 "total_games": player.total,
+                "image_url": player.profile_picture.url,
             }
         )
     return data

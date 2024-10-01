@@ -139,3 +139,6 @@ LOGOUT_REDIRECT_URL = "/login/"
 ALLOWED_HOSTS = ["*"]
 
 CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"
