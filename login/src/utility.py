@@ -72,4 +72,10 @@ def get_comparative_player_data(
         p2_data["winrate"] = "NA"
     p1_data["rating_gain"] = round(p1_data["rating_gain"], 2)
     p2_data["rating_gain"] = round(p2_data["rating_gain"], 2)
+
+    # add profile pictures
+    user_data1 = UserData.objects.get(user=player1)
+    p1_data["image_url"] = user_data1.profile_picture.url
+    user_data2 = UserData.objects.get(user=player2)
+    p2_data["image_url"] = user_data2.profile_picture.url
     return p1_data, p2_data

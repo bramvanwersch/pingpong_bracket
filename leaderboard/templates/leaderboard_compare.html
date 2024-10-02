@@ -1,6 +1,8 @@
 {% extends 'app.html' %}
 {% load static %}
-
+{% block css %}
+    <link rel="stylesheet" href="{% static "css/profile_picture.css" %}">
+{% endblock %}
 {% block app %}
     <div>
         <h2>
@@ -24,10 +26,9 @@
         </div>
     </div>
     <div style="display: flex">
-        <div style="flex: 45%">
+        <div style="flex: 22.5%; align-items: center">
             <table>
                 <tbody>
-
                 <tr>
                     <td>
                         Wins:
@@ -79,11 +80,25 @@
                 </tbody>
             </table>
         </div>
+        <div style="flex: 22.5%;">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%">
+                <div class="profile-pic" style="justify-content: center">
+                    <img src="{{ profile.image_url }}" id="output" width="100"/>
+                </div>
+            </div>
+        </div>
         <div style="flex: 10%; text-align: center">
             <button onclick="window.location = '/leaderboard/compare/{{ other_profile.name }}/{{ profile.name }}/'">
                 <img src="{% static 'icons/arrow-left-right.svg' %}"></button>
         </div>
-        <div style="flex: 45%">
+        <div style="flex: 22.5%; align-items: center">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%">
+                <div class="profile-pic" style="justify-content: center">
+                    <img src="{{ other_profile.image_url }}" id="output" width="100"/>
+                </div>
+            </div>
+        </div>
+        <div style="flex: 22.5%">
             <table>
                 <tbody>
 
@@ -167,7 +182,6 @@
             <th style="color: white;">
                 Date
             </th>
-
         </tr>
         </thead>
         <tbody>
