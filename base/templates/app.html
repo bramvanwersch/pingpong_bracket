@@ -33,7 +33,7 @@
                     </svg>
                 </button>
                 <div style="position: relative">
-                    <a class="notification-btn" style="margin-right: 10px;" href="/chatroom/">
+                    <a class="notification-btn" style="margin-right: 5px;" href="/chatroom/">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                              class="feather feather-bell">
@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 <a class="profile-btn" href="/leaderboard/{{ user.username }}" style="text-decoration: none;">
-                    <img src="{% static 'images/blank-profile.png' %}">
+                <img src="/static/images/blank-profile.png" style="border-radius: 50%" id="profile_picture">
                     <span>{{ user.username }}</span>
                 </a>
                 <a href="/login/logout/" class="app-sidebar-link" title="sign out" style="margin-left: 10px">
@@ -112,7 +112,7 @@
                 modeSwitch.classList.toggle('active');
                 Cookies.set('darkmode', document.documentElement.classList.contains('dark'), {sameSite: 'strict'});
             });
-            
+
             // remember dark mode
             if (Cookies.get('darkmode') === 'true') {
                 document.documentElement.classList.add('dark');
@@ -128,10 +128,20 @@
                     let nr_messages = data["nr_unread"];
                     let nr = $("#notification-nr")
                     nr.html(nr_messages);
-                    if (nr_messages > 0){
+                    if (nr_messages > 0) {
                         nr.css("background", "#d36969")
 
                     }
+                }
+            });
+
+            $.ajax({
+                url: "/api/login/get_image",
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    let image = document.getElementById("profile_picture");
+                    image.src = data.url;
                 }
             });
         });

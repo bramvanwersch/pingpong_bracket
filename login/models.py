@@ -14,6 +14,8 @@ class UserData(Model):
     ties = models.IntegerField(default=0)
     email = models.EmailField(default=None, null=True)
 
+    profile_picture = models.ImageField(upload_to="profile_pictures", default="default_profile_picture.png")
+
     @property
     def total(self) -> int:
         return self.wins + self.losses + self.ties
