@@ -1,8 +1,37 @@
 {% extends 'app.html' %}
 {% load static %}
 
-{% block css %}
-    <link rel="stylesheet" href="{% static "css/profile_picture.css" %}">
+{% block styles %}
+    <style>
+        .profile-pic {
+            color: transparent;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .profile-pic input {
+            display: none;
+        }
+
+        .profile-pic img {
+            position: absolute;
+            object-fit: cover;
+            width: 35px;
+            height: 35px;
+            box-shadow: 0 0 10px 0 rgba(255, 255, 255, 0.35);
+            border-radius: 50px;
+            z-index: 0;
+        }
+
+        .profile-pic .-label {
+            cursor: pointer;
+            height: 35px;
+            width: 35px;
+        }
+    </style>
 {% endblock %}
 {% block app %}
     <h2 style="color: var(--main-color)">
@@ -34,7 +63,9 @@
         {% for player in players %}
             <tr>
                 <td style="padding-bottom: 2px; padding-top: 2px">
-                    <img src="{{ player.image_url }}" id="output" width="50"/>
+                    <div class="profile-pic">
+                        <img src="{{ player.image_url }}" id="output"/>
+                    </div>
                 </td>
                 <td>
                     <a style="color: var(--main-color)" href="/leaderboard/{{ player.name }}/">{{ player.name }}</a>
