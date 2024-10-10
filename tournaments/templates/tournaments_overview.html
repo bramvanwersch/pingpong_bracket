@@ -2,20 +2,39 @@
 {% load static %}
 
 {% block app %}
-    <div>
-        Here go the tournaments
-    </div>
-    <div style="height: 100%" id="canvas-parent">
-        <canvas id="tournament-display" height="500" width="500">
-
+    <div style="height: calc(100% - 32px)" id="canvas-parent">
+        <canvas id="tournament-display" height="500" width="500" style="background-color: lightgrey">
         </canvas>
     </div>
 {% endblock %}
 {% block scripts %}
     <script>
+
+        class Node {
+            constructor(data) {
+                this.child = data.child;
+                this.player1 = data.player1;
+                this.player2 = data.player2;
+                this.round = data.round;
+            }
+        }
+
         let CANVAS = null;
         let CONTEXT = null;
         let CANVAS_PARENT = null;
+        let m3 = new Node({"child": null, "player1": "test", "player2": "other", "round": 2});
+        let m1 = new Node({"child": m3, "player1": "test", "player2": "other", "round": 1});
+        let m2 = new Node({"child": m3, "player1": "test", "player2": "other", "round": 1});
+        let nodes = [m1, m2, m3]
+        let node_map = new Map();
+        let max_round = 0;
+        for (let node of nodes) {
+            if (!node_map.has(node.round)) {
+                node_map.set(node.round, []);
+            }
+            node_map.get(node.round).push(node);
+            max_round = Math.max(max_round, node.round);
+        }
 
         document.addEventListener('DOMContentLoaded', function () {
             CANVAS = document.getElementById("tournament-display");
@@ -32,7 +51,19 @@
         }
 
         function draw_bracket() {
-            CONTEXT.rect(10, 10, 100, 100);
+            let x = 10;
+            let y = 10;
+            let space = 20;
+            let width = 30;
+            let height = 15
+            for (let i = 1; i <= max_round; i++) {
+                for (let node of node_map.get(i)) {
+                    CONTEXT.rect(x, y, width, height);
+                    y += height + space;
+                }
+                x += width + space;
+                y = 10;
+            }
             CONTEXT.stroke()
         }
 
