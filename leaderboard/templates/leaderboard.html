@@ -1,5 +1,9 @@
 {% extends 'app.html' %}
+{% load static %}
 
+{% block css %}
+    <link rel="stylesheet" href="{% static "css/profile_picture.css" %}">
+{% endblock %}
 {% block app %}
     <h2 style="color: var(--main-color)">
         Leaderboard
@@ -8,6 +12,7 @@
     <table id="leaderboard_table">
         <thead>
         <tr>
+            <th></th>
             <th style="color: white;">
                 Name
             </th>
@@ -28,6 +33,9 @@
         <tbody>
         {% for player in players %}
             <tr>
+                <td style="padding-bottom: 2px; padding-top: 2px">
+                    <img src="{{ player.image_url }}" id="output" width="50"/>
+                </td>
                 <td>
                     <a style="color: var(--main-color)" href="/leaderboard/{{ player.name }}/">{{ player.name }}</a>
                 </td>
