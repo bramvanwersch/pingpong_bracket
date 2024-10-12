@@ -10,8 +10,8 @@ def convert(apps, schema_editor):
     scores = Scores.objects.all()
     for score in scores:
         match_id = uuid.uuid4()
-        MatchResult.objects.create(player=score.player1, opponent=score.player2, player_score=score.p1_score, opponents_score=score.p2_score, date=score.date, rate_change=score.p1_rate_change, match_id=match_id)
-        MatchResult.objects.create(player=score.player2, opponent=score.player1, player_score=score.p2_score, opponents_score=score.p1_score, date=score.date, rate_change=score.p2_rate_change, match_id=match_id)
+        MatchResult.objects.create(player_id=score.player1.pk, opponent_id=score.player2.pk, player_score=score.p1_score, opponents_score=score.p2_score, date=score.date, rate_change=score.p1_rate_change, match_id=match_id)
+        MatchResult.objects.create(player_id=score.player2.pk, opponent_id=score.player1.pk, player_score=score.p2_score, opponents_score=score.p1_score, date=score.date, rate_change=score.p2_rate_change, match_id=match_id)
 
 
 class Migration(migrations.Migration):
