@@ -12,7 +12,7 @@
 
         const MATCH_BOX_HEIGTH = 40;
         const MATCH_BOX_WIDTH = 150;
-        const BETWEEN_BOX_WIDTH = MATCH_BOX_WIDTH;
+        const SELECTED_PLAYER_COLOR = '#ffef33'
 
         class Node {
             constructor(data) {
@@ -36,6 +36,7 @@
         let translate = [0, 0]
         let is_draggin = false;
         let drag_start = [0, 0];
+        let selected_player = null;
         for (let nr of [16, 8, 4, 2, 1]) {
             for (let j = 0; j < nr; j++) {
                 nodes.push(new Node({
@@ -65,9 +66,20 @@
             CANVAS.addEventListener('mousedown', (e) => {
                 is_draggin = true;
                 const rect = CANVAS.getBoundingClientRect();
+                // canvas space coordinates
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
                 drag_start = [x + translate[0], y + translate[1]];
+                for (let node of nodes) {
+                    if (point_collides_with_rect(x, y, ...node.rect)){
+                        if (y < node.rect[1] + (node.rect[3] / 2)){
+                            selected_player = node.player1
+                        }else{
+                            selected_player = node.player2
+                        }
+                        break;
+                    }
+                }
             });
 
             CANVAS.addEventListener('mousemove', (e) => {
@@ -103,14 +115,15 @@
             let between_space = (total_width - MATCH_BOX_WIDTH * node_map.size) / (node_map.size)
             let x = 10;
 
-            CONTEXT.translate( - translate[0],  - translate[1])
+            CONTEXT.translate(-translate[0], -translate[1])
             for (let i = 1; i <= max_round; i++) {
                 let round_nodes = node_map.get(i);
                 let vertical_space = total_heigth / round_nodes.length;
                 let y = vertical_space / 2;
                 let go_up = false;
                 for (let node of round_nodes) {
-                    CONTEXT.roundRect(x, y - MATCH_BOX_HEIGTH / 2, MATCH_BOX_WIDTH, MATCH_BOX_HEIGTH, 5);
+                    node.rect = [x, y - MATCH_BOX_HEIGTH / 2, MATCH_BOX_WIDTH, MATCH_BOX_HEIGTH];
+                    CONTEXT.roundRect(...node.rect, 5);
                     CONTEXT.stroke()
                     CONTEXT.beginPath()
                     CONTEXT.moveTo(x + 8, y)
@@ -118,10 +131,18 @@
                     CONTEXT.moveTo(x + MATCH_BOX_WIDTH - 28, y - MATCH_BOX_HEIGTH / 2 + 5)
                     CONTEXT.lineTo(x + MATCH_BOX_WIDTH - 28, y + MATCH_BOX_HEIGTH / 2 - 5)
                     CONTEXT.font = "13px Arial";
+                    if (selected_player === node.player1){
+                        CONTEXT.fillStyle = SELECTED_PLAYER_COLOR;
+                    }
                     CONTEXT.fillText(node.player1, x + 8, y - 5);
-                    CONTEXT.fillText(node.player2, x + 8, y + 15);
                     CONTEXT.fillText(node.p1_score, x + MATCH_BOX_WIDTH - 22, y - 5);
+                    CONTEXT.fillStyle = 'black';
+                    if (selected_player === node.player2){
+                        CONTEXT.fillStyle = SELECTED_PLAYER_COLOR;
+                    }
+                    CONTEXT.fillText(node.player2, x + 8, y + 15);
                     CONTEXT.fillText(node.p2_score, x + MATCH_BOX_WIDTH - 22, y + 15);
+                    CONTEXT.fillStyle = 'black';
                     if (node_map.has(i + 1)) {
                         CONTEXT.moveTo(x + MATCH_BOX_WIDTH, y);
                         CONTEXT.lineTo(x + MATCH_BOX_WIDTH + between_space / 2, y);
@@ -142,12 +163,15 @@
             CONTEXT.translate(translate[0], translate[1])
         }
 
-        function click_canvas(event) {
-            console.log(event)
-        }
+        function point_collides_with_rect(pointX, pointY, rectX, rectY, rectWidth, rectHeight) {
+            // Check if the point's x-coordinate is within the rectangle's x-range
+            const isXValid = pointX >= rectX && pointX <= rectX + rectWidth;
 
-        function unclick_canvas(event) {
-            console.log(event)
+            // Check if the point's y-coordinate is within the rectangle's y-range
+            const isYValid = pointY >= rectY && pointY <= rectY + rectHeight;
+
+            // Return true if both conditions are met
+            return isXValid && isYValid;
         }
     </script>
 {% endblock %}
