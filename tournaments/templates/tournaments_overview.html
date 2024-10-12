@@ -10,11 +10,15 @@
 {% block scripts %}
     <script>
 
+        const MATCH_BOX_HEIGTH = 40;
+        const MATCH_BOX_WIDTH = 80;
+        const BETWEEN_BOX_WIDTH = MATCH_BOX_WIDTH * 2;
+
         class Node {
             constructor(data) {
-                this.child = data.child;
                 this.player1 = data.player1;
                 this.player2 = data.player2;
+                this.round_number = data.round_number;
                 this.round = data.round;
             }
         }
@@ -22,12 +26,18 @@
         let CANVAS = null;
         let CONTEXT = null;
         let CANVAS_PARENT = null;
-        let m3 = new Node({"child": null, "player1": "test", "player2": "other", "round": 2});
-        let m1 = new Node({"child": m3, "player1": "test", "player2": "other", "round": 1});
-        let m2 = new Node({"child": m3, "player1": "test", "player2": "other", "round": 1});
-        let nodes = [m1, m2, m3]
+        let nodes = []
+        let round = 1;
+        for (let nr of [16, 8, 4, 2, 1]){
+            for (let j = 0; j < nr; j++){
+                nodes.push(new Node({"player1": "a", "player2": "b", "round_number": j + 1, "round": round}))
+            }
+            round += 1;
+        }
+        console.log(nodes)
         let node_map = new Map();
         let max_round = 0;
+        // NOTE: reliant on the order of input nodes
         for (let node of nodes) {
             if (!node_map.has(node.round)) {
                 node_map.set(node.round, []);
@@ -51,20 +61,35 @@
         }
 
         function draw_bracket() {
+            let total_heigth = CANVAS.height;
             let x = 10;
-            let y = 10;
-            let space = 20;
-            let width = 30;
-            let height = 15
             for (let i = 1; i <= max_round; i++) {
-                for (let node of node_map.get(i)) {
-                    CONTEXT.rect(x, y, width, height);
-                    y += height + space;
+                let round_nodes = node_map.get(i);
+                let vertical_space = total_heigth / (round_nodes.length + 1);
+                let y = vertical_space;
+                let go_up = false;
+                for (let node of round_nodes) {
+                    CONTEXT.rect(x, y - MATCH_BOX_HEIGTH / 2, MATCH_BOX_WIDTH, MATCH_BOX_HEIGTH);
+                    CONTEXT.stroke()
+                    if (!node_map.has(i + 1)){
+                        continue;
+                    }
+                    CONTEXT.beginPath();
+                    CONTEXT.moveTo(x + MATCH_BOX_WIDTH, y);
+                    CONTEXT.lineTo(x + MATCH_BOX_WIDTH + BETWEEN_BOX_WIDTH / 2, y);
+                    if (go_up){
+                        CONTEXT.lineTo(x + MATCH_BOX_WIDTH + BETWEEN_BOX_WIDTH / 2, y - vertical_space / 2);
+                        CONTEXT.lineTo(x + MATCH_BOX_WIDTH + BETWEEN_BOX_WIDTH, y - vertical_space / 2);
+                    }else{
+                        CONTEXT.lineTo(x + MATCH_BOX_WIDTH + BETWEEN_BOX_WIDTH / 2, y + vertical_space / 2);
+                        CONTEXT.lineTo(x + MATCH_BOX_WIDTH + BETWEEN_BOX_WIDTH, y + vertical_space / 2);
+                    }
+                    CONTEXT.stroke()
+                    go_up = !go_up;
+                    y += vertical_space;
                 }
-                x += width + space;
-                y = 10;
+                x += BETWEEN_BOX_WIDTH + MATCH_BOX_WIDTH;
             }
-            CONTEXT.stroke()
         }
 
     </script>
