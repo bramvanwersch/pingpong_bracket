@@ -1,17 +1,17 @@
 {% extends 'app.html' %}
 
 {% block app %}
-    <div>
+    <div >
         <!-- Header Section -->
         <h2 style="color: var(--main-color)">Home</h2>
         <hr>
         <!-- Flex container for form and table -->
-        <div style="display: flex; justify-content: flex-start; align-items: center; margin-top: 40px;">
+        <div style="display: flex; justify-content: flex-start; margin-top: 40px; width: 100%">
             <!-- Form Section -->
 
             <!-- Table Section -->
-            <div style="flex: 2;">
-                <table id="matches_table">
+            <div style="flex-grow: 1">
+                <table id="matches_table" style="width: 100%">
                     <thead>
                     <tr>
                         <th style="color: white;"><span>Match</span></th>
@@ -75,22 +75,4 @@
         </div>
     </div>
 
-
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"/>
-    <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            var table = $('#matches_table').DataTable({
-                "pageLength": 12,
-                "lengthChange": false,
-                "order": [],
-                "dom": 'lrtip'
-            });
-            $('.search-input').on('keyup', function () {
-                table.search(this.value).draw();
-            });
-        });
-    </script>
 {% endblock %}

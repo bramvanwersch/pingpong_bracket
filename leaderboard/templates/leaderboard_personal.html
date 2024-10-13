@@ -113,7 +113,7 @@
     <h3 style="color: var(--main-color)">
         Recent matches
     </h3>
-    <table id="leaderboard_personal_table">
+    <table id="leaderboard_personal_table" style="width: 100%">
         <thead>
         <tr>
             <th style="color: white;">
@@ -189,15 +189,6 @@
 {% block scripts %}
     <script>
         $(document).ready(function () {
-            var table = $('#leaderboard_personal_table').DataTable({
-                "pageLength": 7,
-                "lengthChange": false,
-                "order": [],
-                "dom": 'lrtip'
-            });
-            $('.search-input').on('keyup', function () {
-                table.search(this.value).draw();
-            });
             make_graph()
         });
 
