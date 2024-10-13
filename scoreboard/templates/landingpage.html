@@ -1,7 +1,14 @@
 {% extends 'app.html' %}
-
+{% load static %}
+{% block js-packages %}
+    <script src="{% static 'js-packages/select2.full.min.js' %}" type="text/javascript">
+    </script>
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css-package/select2.min.css' %}">
+{% endblock %}
 {% block app %}
-    <div >
+    <div>
         <!-- Header Section -->
         <h2 style="color: var(--main-color)">Home</h2>
         <hr>
@@ -46,7 +53,7 @@
                     <div>
                         <label for="oponent" style="margin-right: 5px; color: var(--main-color)">Opponent:</label>
                         <hr>
-                        <select id="oponent" name="oponent">
+                        <select id="oponent" name="oponent" style="width: 200px">
                             {% for name in names %}
                                 <option value="{{ name }}">{{ name }}</option>
                             {% endfor %}
@@ -75,4 +82,13 @@
         </div>
     </div>
 
+{% endblock %}
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            $('#oponent').select2({
+                placeholder: "Choose a person"
+            });
+        });
+    </script>
 {% endblock %}
