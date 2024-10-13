@@ -67,9 +67,9 @@
                 is_draggin = true;
                 const rect = CANVAS.getBoundingClientRect();
                 // canvas space coordinates
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                drag_start = [x + translate[0], y + translate[1]];
+                const x = e.clientX - rect.left + translate[0];
+                const y = e.clientY - rect.top + translate[1];
+                drag_start = [x, y];
                 for (let node of nodes) {
                     if (point_collides_with_rect(x, y, ...node.rect)){
                         if (y < node.rect[1] + (node.rect[3] / 2)){
