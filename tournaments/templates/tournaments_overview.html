@@ -1,177 +1,74 @@
 {% extends 'app.html' %}
-{% load static %}
 
 {% block app %}
-    <div style="height: calc(100% - 32px)" id="canvas-parent">
-        <canvas id="tournament-display" height="500" width="500" style="background-color: lightgrey">
-        </canvas>
+    <div style="height: 100%">
+        <!-- Header Section -->
+        <h2 style="color: var(--main-color)">Tournaments</h2>
+        <hr>
+        <!-- Flex container for form and table -->
+        <div style="display: flex; justify-content: flex-start; align-items: center; margin-top: 40px;">
+            <div style="flex: 2;">
+                <table id="matches_table">
+                    <thead>
+                    <tr>
+                        <th style="color: white;"><span>Match</span></th>
+                        <th style="color: white;"><span>Result</span></th>
+                        <th style="color: white;"><span>Score</span></th>
+                        <th style="color: white;"><span>Rating change</span></th>
+                        <th style="color: white;"><span>Date</span></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for match in matches %}
+                        <tr>
+                            <td class="lalign">
+                                <a href="/leaderboard/{{ match.player1 }}"
+                                   style="color:var(--main-color)">{{ match.player1 }}</a> vs
+                                <a href="/leaderboard/{{ match.player2 }}"
+                                   style="color:var(--main-color)">{{ match.player2 }}</a>
+                            </td>
+                            <td>{{ match.result }}</td>
+                            <td>{{ match.score }}</td>
+                            <td>{{ match.rating }}</td>
+                            <td>{{ match.date }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-left: 20px; margin-right: 50px">
+                <h3 style="color: var(--main-color)">Add new match results</h3>
+                <form action="/add_score/" method="post" style="display: flex; flex-direction: column; gap: 10px;">
+                    {% csrf_token %}
+                    <div>
+                        <label for="oponent" style="margin-right: 5px; color: var(--main-color)">Opponent:</label>
+                        <hr>
+                        <select id="oponent" name="oponent">
+                            {% for name in names %}
+                                <option value="{{ name }}">{{ name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="my_points" style="margin-right: 5px; color: var(--main-color)">My score:</label>
+                        <hr>
+                        <input type="number" min="0" id="my_points" placeholder="0" name="my_points" value="0">
+                    </div>
+                    <div>
+                        <label for="oponent_points" style="margin-right: 5px; color: var(--main-color)">Opponent
+                            score:</label>
+                        <hr>
+                        <input type="number" min="0" id="oponent_points" placeholder="0" name="oponent_points"
+                               value="0">
+                    </div>
+                    <div>
+                        {#                        <button type="submit">Add score</button>#}
+                        <span class="button-wrap">
+                            <button type="submit" class="btn-score">Add Score</button>
+                        </span>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-{% endblock %}
-{% block scripts %}
-    <script>
-
-        const MATCH_BOX_HEIGTH = 40;
-        const MATCH_BOX_WIDTH = 150;
-        const SELECTED_PLAYER_COLOR = '#ffef33'
-
-        class Node {
-            constructor(data) {
-                this.player1 = data.player1;
-                this.player2 = data.player2;
-                this.p1_score = data.p1_score;
-                this.p2_score = data.p2_score;
-                this.round_number = data.round_number;
-                this.round = data.round;
-                this.rect = null;
-            }
-        }
-
-        let CANVAS = null;
-        let CONTEXT = null;
-        let CANVAS_PARENT = null;
-        let nodes = []
-        let round = 1;
-
-        // dragging
-        let translate = [0, 0]
-        let is_draggin = false;
-        let drag_start = [0, 0];
-        let selected_player = null;
-        for (let nr of [16, 8, 4, 2, 1]) {
-            for (let j = 0; j < nr; j++) {
-                nodes.push(new Node({
-                    "player1": "player1",
-                    "player2": "player2",
-                    "round_number": j + 1,
-                    "round": round,
-                    "p1_score": 0,
-                    "p2_score": 2
-                }))
-            }
-            round += 1;
-        }
-        let node_map = new Map();
-        let max_round = 0;
-        // NOTE: reliant on the order of input nodes
-        for (let node of nodes) {
-            if (!node_map.has(node.round)) {
-                node_map.set(node.round, []);
-            }
-            node_map.get(node.round).push(node);
-            max_round = Math.max(max_round, node.round);
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            CANVAS = document.getElementById("tournament-display");
-            CANVAS.addEventListener('mousedown', (e) => {
-                is_draggin = true;
-                const rect = CANVAS.getBoundingClientRect();
-                // canvas space coordinates
-                const x = e.clientX - rect.left + translate[0];
-                const y = e.clientY - rect.top + translate[1];
-                drag_start = [x, y];
-                for (let node of nodes) {
-                    if (point_collides_with_rect(x, y, ...node.rect)){
-                        if (y < node.rect[1] + (node.rect[3] / 2)){
-                            selected_player = node.player1
-                        }else{
-                            selected_player = node.player2
-                        }
-                        break;
-                    }
-                }
-            });
-
-            CANVAS.addEventListener('mousemove', (e) => {
-                if (!is_draggin) return;
-
-                const rect = CANVAS.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                translate = [(drag_start[0] - x), (drag_start[1] - y)]
-            });
-
-            window.addEventListener('mouseup', () => {
-                is_draggin = false;
-            });
-
-            CONTEXT = CANVAS.getContext("2d");
-            CANVAS_PARENT = document.getElementById("canvas-parent");
-            loop();
-        })
-
-        function loop() {
-            CANVAS.width = CANVAS_PARENT.clientWidth;
-            CANVAS.height = CANVAS_PARENT.clientHeight;
-            draw_bracket();
-            requestAnimationFrame(loop)
-        }
-
-        function draw_bracket() {
-            let min_heigth = node_map.get(1).length * (MATCH_BOX_HEIGTH + 10);
-            let total_heigth = Math.max(CANVAS.height, min_heigth);
-            let min_width = 20 + node_map.size * (MATCH_BOX_WIDTH + 20);
-            let total_width = Math.max(CANVAS.width, min_width);
-            let between_space = (total_width - MATCH_BOX_WIDTH * node_map.size) / (node_map.size)
-            let x = 10;
-
-            CONTEXT.translate(-translate[0], -translate[1])
-            for (let i = 1; i <= max_round; i++) {
-                let round_nodes = node_map.get(i);
-                let vertical_space = total_heigth / round_nodes.length;
-                let y = vertical_space / 2;
-                let go_up = false;
-                for (let node of round_nodes) {
-                    node.rect = [x, y - MATCH_BOX_HEIGTH / 2, MATCH_BOX_WIDTH, MATCH_BOX_HEIGTH];
-                    CONTEXT.roundRect(...node.rect, 5);
-                    CONTEXT.stroke()
-                    CONTEXT.beginPath()
-                    CONTEXT.moveTo(x + 8, y)
-                    CONTEXT.lineTo(x + MATCH_BOX_WIDTH - 8, y)
-                    CONTEXT.moveTo(x + MATCH_BOX_WIDTH - 28, y - MATCH_BOX_HEIGTH / 2 + 5)
-                    CONTEXT.lineTo(x + MATCH_BOX_WIDTH - 28, y + MATCH_BOX_HEIGTH / 2 - 5)
-                    CONTEXT.font = "13px Arial";
-                    if (selected_player === node.player1){
-                        CONTEXT.fillStyle = SELECTED_PLAYER_COLOR;
-                    }
-                    CONTEXT.fillText(node.player1, x + 8, y - 5);
-                    CONTEXT.fillText(node.p1_score, x + MATCH_BOX_WIDTH - 22, y - 5);
-                    CONTEXT.fillStyle = 'black';
-                    if (selected_player === node.player2){
-                        CONTEXT.fillStyle = SELECTED_PLAYER_COLOR;
-                    }
-                    CONTEXT.fillText(node.player2, x + 8, y + 15);
-                    CONTEXT.fillText(node.p2_score, x + MATCH_BOX_WIDTH - 22, y + 15);
-                    CONTEXT.fillStyle = 'black';
-                    if (node_map.has(i + 1)) {
-                        CONTEXT.moveTo(x + MATCH_BOX_WIDTH, y);
-                        CONTEXT.lineTo(x + MATCH_BOX_WIDTH + between_space / 2, y);
-                        if (go_up) {
-                            CONTEXT.lineTo(x + MATCH_BOX_WIDTH + between_space / 2, y - vertical_space / 2);
-                            CONTEXT.lineTo(x + MATCH_BOX_WIDTH + between_space, y - vertical_space / 2);
-                        } else {
-                            CONTEXT.lineTo(x + MATCH_BOX_WIDTH + between_space / 2, y + vertical_space / 2);
-                            CONTEXT.lineTo(x + MATCH_BOX_WIDTH + between_space, y + vertical_space / 2);
-                        }
-                    }
-                    CONTEXT.stroke()
-                    go_up = !go_up;
-                    y += vertical_space;
-                }
-                x += between_space + MATCH_BOX_WIDTH;
-            }
-            CONTEXT.translate(translate[0], translate[1])
-        }
-
-        function point_collides_with_rect(pointX, pointY, rectX, rectY, rectWidth, rectHeight) {
-            // Check if the point's x-coordinate is within the rectangle's x-range
-            const isXValid = pointX >= rectX && pointX <= rectX + rectWidth;
-
-            // Check if the point's y-coordinate is within the rectangle's y-range
-            const isYValid = pointY >= rectY && pointY <= rectY + rectHeight;
-
-            // Return true if both conditions are met
-            return isXValid && isYValid;
-        }
-    </script>
 {% endblock %}
