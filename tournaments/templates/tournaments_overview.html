@@ -1,5 +1,12 @@
 {% extends 'app.html' %}
-
+{% load static %}
+{% block js-packages %}
+    <script src="{% static 'js-packages/select2.full.min.js' %}" type="text/javascript">
+    </script>
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css-package/select2.min.css' %}">
+{% endblock %}
 {% block app %}
     <div style="height: 100%">
         <!-- Header Section -->
@@ -39,14 +46,14 @@
             <div style="margin-left: 20px; margin-right: 50px">
                 <h3 style="color: var(--main-color)">Create a new tournament</h3>
                 <div style="max-width: 350px; margin-bottom: 15px; font-size: 14px">
-                     <i>
+                    <i>
                         You can create your own tournament here. The start date determines when matches are started to
-                         be planned in. Before that time people can click to join your tournament (unless you specifiy
-                         that this is not allowed).
+                        be planned in. Before that time people can click to join your tournament (unless you specifiy
+                        that this is not allowed).
                     </i>
                 </div>
                 <hr>
-                <form action="/adad/" method="post" style="display: flex; flex-direction: column; gap: 10px;">
+                <form action="/tournament/create" method="post" style="display: flex; flex-direction: column; gap: 10px;">
                     {% csrf_token %}
                     <div>
                         <label for="tournament_name" style="margin-left: 5px">
@@ -70,19 +77,40 @@
                         <input id="start_date" type="date" style="width: 100%">
                     </div>
                     <div>
+                        <label for="invites">
+                            Invites:
+                        </label>
+                    <hr>
+                        <select id="invites" name="chatter" multiple="multiple" style="width: 100%">
+                            {% for name, id in names.items %}
+                                <option value="{{ id }}">
+                                    {{ name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
                         <label for="only_direct">
                             Only allow directly invited:
                         </label>
                         <input type="checkbox" id="only_direct">
                     </div>
                     <div>
-                        {#                        <button type="submit">Add score</button>#}
                         <span class="button-wrap">
-                            <button type="submit" class="btn-score">Add Score</button>
+                            <button type="submit" class="btn-score">Create tournament</button>
                         </span>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+        window.onload = function () {
+            $('#invites').select2({
+                placeholder: "Choose one or more people"
+            });
+        }
+    </script>
 {% endblock %}
