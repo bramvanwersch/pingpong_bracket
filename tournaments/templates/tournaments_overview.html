@@ -6,9 +6,9 @@
         <h2 style="color: var(--main-color)">Tournaments</h2>
         <hr>
         <!-- Flex container for form and table -->
-        <div style="display: flex; justify-content: flex-start; align-items: center; margin-top: 40px;">
-            <div style="flex: 2;">
-                <table id="matches_table">
+        <div style="display: flex; justify-content: flex-start; margin-top: 40px;">
+            <div style="flex-grow: 1">
+                <table id="matches_table" style="width: 100%">
                     <thead>
                     <tr>
                         <th style="color: white;"><span>Match</span></th>
@@ -37,29 +37,43 @@
                 </table>
             </div>
             <div style="margin-left: 20px; margin-right: 50px">
-                <h3 style="color: var(--main-color)">Add new match results</h3>
-                <form action="/add_score/" method="post" style="display: flex; flex-direction: column; gap: 10px;">
+                <h3 style="color: var(--main-color)">Create a new tournament</h3>
+                <div style="max-width: 350px; margin-bottom: 15px; font-size: 14px">
+                     <i>
+                        You can create your own tournament here. The start date determines when matches are started to
+                         be planned in. Before that time people can click to join your tournament (unless you specifiy
+                         that this is not allowed).
+                    </i>
+                </div>
+                <hr>
+                <form action="/adad/" method="post" style="display: flex; flex-direction: column; gap: 10px;">
                     {% csrf_token %}
                     <div>
-                        <label for="oponent" style="margin-right: 5px; color: var(--main-color)">Opponent:</label>
+                        <label for="tournament_name" style="margin-left: 5px">
+                            Name:
+                        </label>
                         <hr>
-                        <select id="oponent" name="oponent">
-                            {% for name in names %}
-                                <option value="{{ name }}">{{ name }}</option>
-                            {% endfor %}
-                        </select>
+                        <input id="tournament_name">
                     </div>
                     <div>
-                        <label for="my_points" style="margin-right: 5px; color: var(--main-color)">My score:</label>
+                        <label for="start_date" style="margin-left: 5px">
+                            Start Date:
+                        </label>
                         <hr>
-                        <input type="number" min="0" id="my_points" placeholder="0" name="my_points" value="0">
+                        <input id="start_date" type="date" style="width: 100%">
                     </div>
                     <div>
-                        <label for="oponent_points" style="margin-right: 5px; color: var(--main-color)">Opponent
-                            score:</label>
+                        <label for="start_date" style="margin-left: 5px">
+                            End Date:
+                        </label>
                         <hr>
-                        <input type="number" min="0" id="oponent_points" placeholder="0" name="oponent_points"
-                               value="0">
+                        <input id="start_date" type="date" style="width: 100%">
+                    </div>
+                    <div>
+                        <label for="only_direct">
+                            Only allow directly invited:
+                        </label>
+                        <input type="checkbox" id="only_direct">
                     </div>
                     <div>
                         {#                        <button type="submit">Add score</button>#}
