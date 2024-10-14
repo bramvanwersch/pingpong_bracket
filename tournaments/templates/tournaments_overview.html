@@ -18,34 +18,34 @@
                 <table id="matches_table" style="width: 100%">
                     <thead>
                     <tr>
-                        <th style="color: white;"><span>Match</span></th>
-                        <th style="color: white;"><span>Result</span></th>
-                        <th style="color: white;"><span>Score</span></th>
-                        <th style="color: white;"><span>Rating change</span></th>
-                        <th style="color: white;"><span>Date</span></th>
+                        <th style="color: white;"><span>Name</span></th>
+                        <th style="color: white;"><span>creator</span></th>
+                        <th style="color: white;"><span>Status</span></th>
+                        <th style="color: white;"><span>Nr players</span></th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for match in matches %}
+                    {% for data in tournament_data %}
                         <tr>
-                            <td class="lalign">
-                                <a href="/leaderboard/{{ match.player1 }}"
-                                   style="color:var(--main-color)">{{ match.player1 }}</a> vs
-                                <a href="/leaderboard/{{ match.player2 }}"
-                                   style="color:var(--main-color)">{{ match.player2 }}</a>
-                            </td>
-                            <td>{{ match.result }}</td>
-                            <td>{{ match.score }}</td>
-                            <td>{{ match.rating }}</td>
-                            <td>{{ match.date }}</td>
+                            <td><a href="/tournament/detail/{{ data.db_id }}">{{ data.name }}</a></td>
+                            <td>{{ data.creator }}</td>
+                            <td>{{ data.status }}</td>
+                            <td>{{ data.nr_participants }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
                 </table>
             </div>
-            <div style="margin-left: 20px; margin-right: 50px">
+            <div style="margin-left: 20px; margin-right: 15px; max-width: 350px;">
                 <h3 style="color: var(--main-color)">Create a new tournament</h3>
-                <div style="max-width: 350px; margin-bottom: 15px; font-size: 14px">
+                {% if issue %}
+                    <ul>
+                        <li style="color: red">
+                            {{ issue }}
+                        </li>
+                    </ul>
+                {% endif %}
+                <div style=" margin-bottom: 15px; font-size: 14px">
                     <i>
                         You can create your own tournament here. The start date determines when matches are started to
                         be planned in. Before that time people can click to join your tournament (unless you specifiy
@@ -53,35 +53,35 @@
                     </i>
                 </div>
                 <hr>
-                <form action="/tournament/create" method="post" style="display: flex; flex-direction: column; gap: 10px;">
+                <form action="/tournament/create" method="post"
+                      style="display: flex; flex-direction: column; gap: 10px;">
                     {% csrf_token %}
                     <div>
                         <label for="tournament_name" style="margin-left: 5px">
                             Name:
                         </label>
                         <hr>
-                        <input id="tournament_name">
+                        <input id="tournament_name" style="width: 100%" name="name">
                     </div>
                     <div>
-                        <label for="start_date" style="margin-left: 5px">
-                            Start Date:
+                        <label for="tournamnet_type">
+                            Tournament type:
                         </label>
                         <hr>
-                        <input id="start_date" type="date" style="width: 100%">
+                        <select id="tournamnet_type" name="tournamnet_type" style="width: 100%">
+                            {% for type_ in types %}
+                                <option value="{{ type_ }}">
+                                    {{ type_ }}
+                                </option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div>
-                        <label for="start_date" style="margin-left: 5px">
-                            End Date:
-                        </label>
-                        <hr>
-                        <input id="start_date" type="date" style="width: 100%">
-                    </div>
-                    <div>
-                        <label for="invites">
+                        <label for="invitees">
                             Invites:
                         </label>
-                    <hr>
-                        <select id="invites" name="chatter" multiple="multiple" style="width: 100%">
+                        <hr>
+                        <select id="invitees" name="invitees" multiple="multiple" style="width: 100%">
                             {% for name, id in names.items %}
                                 <option value="{{ id }}">
                                     {{ name }}
@@ -93,8 +93,9 @@
                         <label for="only_direct">
                             Only allow directly invited:
                         </label>
-                        <input type="checkbox" id="only_direct">
+                        <input type="checkbox" id="only_direct" name="only_direct">
                     </div>
+
                     <div>
                         <span class="button-wrap">
                             <button type="submit" class="btn-score">Create tournament</button>
@@ -108,8 +109,11 @@
 {% block scripts %}
     <script>
         window.onload = function () {
-            $('#invites').select2({
+            $('#invitees').select2({
                 placeholder: "Choose one or more people"
+            });
+            $('#tournamnet_type').select2({
+                placeholder: "Type of tournament"
             });
         }
     </script>

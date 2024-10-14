@@ -9,23 +9,25 @@ class Tournament(models.Model):
 
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=128)
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateField(null=True, default=None)
+    end_date = models.DateField(null=True, default=None)
 
     class TournamentState(models.Choices):
         NOT_STARTED = 'Not started'
         RUNNING = 'Running'
         FINISHED = 'Finished'
 
-    status = models.CharField(max_length=16, choices=TournamentState.choices)
+    status = models.CharField(max_length=16, choices=TournamentState.choices, default=TournamentState.NOT_STARTED)
 
     class TournamentType(models.Choices):
         SINGLE_ELIMINATION = "Single elimination"
-        DOUBLE_ELIMINATION = "Double elimination"
-        SEATING_AND_SINGLE_ELIMINATION = "Seating and single elimination"
-        SEATING_AND_DOUBLE_ELIMINATION = "Seating and double elimination"
+        # DOUBLE_ELIMINATION = "Double elimination"
+        SEEDING_AND_SINGLE_ELIMINATION = "Seeding and single elimination"
+        # SEEDING_AND_DOUBLE_ELIMINATION = "Seeding and double elimination"
 
     tournament_type = models.CharField(max_length=64, choices=TournamentType.choices)
+
+    invite_only = models.BooleanField(default=False)
 
 
 class TournamentGame(models.Model):
@@ -45,3 +47,13 @@ class TournamentGame(models.Model):
     # the bracket structure
     round_number = models.IntegerField(null=True, default=None)
     round = models.IntegerField(null=True, default=None)
+
+
+class TournamentParticipant(models.Model):
+
+    class Meta:
+        db_table = "tournament_participant"
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
+    place = models.IntegerField(null=True, default=None)
