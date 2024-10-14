@@ -38,7 +38,7 @@
         Leaderboard
     </h2>
     <hr>
-    <table id="leaderboard_table">
+    <table id="leaderboard_table" style="width: 100%">
         <thead>
         <tr>
             <th></th>
@@ -90,20 +90,4 @@
         {% endfor %}
         </tbody>
     </table>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"/>
-    <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            var table = $('#leaderboard_table').DataTable({
-                "pageLength": 12,
-                "lengthChange": false,
-                "order": [],
-                "dom": 'lrtip'
-            });
-            $('.search-input').on('keyup', function () {
-                table.search(this.value).draw();
-            });
-        });
-    </script>
 {% endblock %}

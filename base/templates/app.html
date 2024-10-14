@@ -98,9 +98,14 @@
             </a>
             </div>
 
-            <div class="projects-section">
-                {% block app %}
-                {% endblock %}
+            <div class="outer-projects-section">
+                <div class="projects-section">
+                    {% block app %}
+                    {% endblock %}
+                </div>
+                <div style="visibility: hidden">
+                    i am invisible
+                </div>
             </div>
         </div>
     </div>
