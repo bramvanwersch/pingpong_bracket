@@ -3,7 +3,6 @@ from django.db import models
 
 
 class Tournament(models.Model):
-
     class Meta:
         db_table = "tournament"
 
@@ -13,9 +12,9 @@ class Tournament(models.Model):
     end_date = models.DateField(null=True, default=None)
 
     class TournamentState(models.Choices):
-        NOT_STARTED = 'Not started'
-        RUNNING = 'Running'
-        FINISHED = 'Finished'
+        NOT_STARTED = "Not started"
+        RUNNING = "Running"
+        FINISHED = "Finished"
 
     status = models.CharField(max_length=16, choices=TournamentState.choices, default=TournamentState.NOT_STARTED)
 
@@ -31,7 +30,6 @@ class Tournament(models.Model):
 
 
 class TournamentGame(models.Model):
-
     class Meta:
         db_table = "tournament_game"
 
@@ -50,7 +48,6 @@ class TournamentGame(models.Model):
 
 
 class TournamentParticipant(models.Model):
-
     class Meta:
         db_table = "tournament_participant"
 

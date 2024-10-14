@@ -1,5 +1,3 @@
-import datetime
-
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 
@@ -18,7 +16,11 @@ class TournamentMainView(BaseView):
         issue = ""
         if "issue" in request.session:
             issue = request.session.pop("issue")
-        return TemplateResponse(request, "tournaments_overview.html", {"names": names, "issue": issue, "types": types, "tournament_data": tournament_data})
+        return TemplateResponse(
+            request,
+            "tournaments_overview.html",
+            {"names": names, "issue": issue, "types": types, "tournament_data": tournament_data},
+        )
 
 
 class CreateTournamentView(BaseView):
@@ -28,13 +30,19 @@ class CreateTournamentView(BaseView):
         if not name:
             request.session["issue"] = "Please provide a name"
             return redirect("/tournament/")
-        only_direct = data.get("only_direct", None) == 'on'
+        only_direct = data.get("only_direct", None) == "on"
         invitees = data.getlist("invitees", [])
         type_ = data.get("tournamnet_type")
         if only_direct and len(invitees) <= 1:
             request.session["issue"] = "When using direct invites, invite at least 2 people"
             return redirect("/tournament/")
-        tournament = Tournament.objects.create(creator=request.user, name=name, status=Tournament.TournamentState.NOT_STARTED, tournament_type=type_, invite_only=only_direct)
+        tournament = Tournament.objects.create(
+            creator=request.user,
+            name=name,
+            status=Tournament.TournamentState.NOT_STARTED,
+            tournament_type=type_,
+            invite_only=only_direct,
+        )
         TournamentParticipant.objects.create(user_id=request.user.pk, tournament=tournament)
         for invite in invitees:
             TournamentParticipant.objects.create(user_id=invite, tournament=tournament)
@@ -42,7 +50,6 @@ class CreateTournamentView(BaseView):
 
 
 class TournamentDetailView(BaseView):
-
     def get(self, request, tournament_id):
         tournament = Tournament.objects.get(pk=tournament_id)
         data = utility.tournament_table_data([tournament])[0]
