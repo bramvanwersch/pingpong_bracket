@@ -55,5 +55,5 @@ class ChatChallengeView(BaseView):
     def get(self, request, user_name: str):
         challenge_user = User.objects.get(username=user_name)
         group = ChatGroup.create_or_get_group(request.user, [challenge_user])
-        utility.send_message(f"{request.user.username} challenges you to a match!", request.user, f"{group.id}")
+        utility.send_message("I challenge you to a match!", request.user, f"{group.id}")
         return redirect(f"/chatroom/{group.pk}")

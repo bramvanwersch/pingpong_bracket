@@ -8,13 +8,26 @@
         </h2>
         <hr>
         <div style="display: flex">
+            <div style="margin-right: 30px; max-width: 300px;">
+                {% for game in games %}
+
+                {% endfor %}
+            </div>
             <div style="height: 800px; flex-grow: 1;" id="canvas-parent">
-                <canvas id="tournament-display" height="500" width="500" style="background-color: lightgrey;border-radius: 20px">
+                <canvas id="tournament-display" height="500" width="500"
+                        style="background-color: lightgrey;border-radius: 20px">
                 </canvas>
             </div>
-            <div style="margin-left: 30px">
-                <div style="width: 100%">
-                    <table>
+            <div style="margin-left: 30px; max-width: 300px">
+                <div style="width: 300px">
+                    <table style="width: 100%">
+                        <thead>
+                        <tr>
+                            <th style="color: white; text-align: center" colspan="2">
+                                Information
+                            </th>
+                        </tr>
+                        </thead>
                         <tbody>
                         <tr>
                             <td>
@@ -72,33 +85,43 @@
                 {% if data.status == 'Not started' %}
                     <div>
                         <div style="margin-top: 10px">
-                            {% if user not in data.participants and not data.invite_only %}
+                            {% if user in data.participants %}
                                 <span class="button-wrap">
-                            <button onclick="window.location = '/tournament/join/{{ data.db_id }}'" class="btn-score">
-                                Join
-                            </button>
-                        </span>
-                            {% else %}
+                                    <button onclick="window.location = '/tournament/leave/{{ data.db_id }}'"
+                                            class="btn-score">
+                                        Leave
+                                    </button>
+                                </span>
+                            {% elif user not in data.participants and not data.invite_only or user == data.creator %}
                                 <span class="button-wrap">
-                            <button onclick="window.location = '/tournament/leave/{{ data.db_id }}'" class="btn-score">
-                                Leave
-                            </button>
-                        </span>
+                                    <button onclick="window.location = '/tournament/join/{{ data.db_id }}'"
+                                            class="btn-score">
+                                        Join
+                                    </button>
+                                </span>
+
+                            {% endif %}
+                            {% if user == data.creator %}
+                                <span class="button-wrap">
+                                    <button onclick="delete_tournament()" class="btn-score">
+                                        Delete
+                                    </button>
+                                </span>
                             {% endif %}
                         </div>
                     </div>
                     {% if user == data.creator %}
                         <div style="margin-top: 20px;">
+                            {% if issue %}
+                                <ul>
+                                    <li style="color: red">
+                                        {{ issue }}
+                                    </li>
+                                </ul>
+                            {% endif %}
                             <form action="/tournament/start/{{ data.db_id }}" method="post"
                                   style="display: flex; flex-direction: column; gap: 10px;">
                                 {% csrf_token %}
-                                <div>
-                                    <label for="start_date" style="margin-left: 5px">
-                                        Start Date:
-                                    </label>
-                                    <hr>
-                                    <input id="start_date" type="date" style="width: 100%" name="start_date">
-                                </div>
                                 <div>
                                     <label for="end_date" style="margin-left: 5px">
                                         End Date:
@@ -107,9 +130,9 @@
                                     <input id="end_date" type="date" style="width: 100%" name="end_date">
                                 </div>
                                 <div>
-                    <span class="button-wrap">
-                        <button type="submit" class="btn-score">Start tournament</button>
-                    </span>
+                                <span class="button-wrap">
+                                    <button type="submit" class="btn-score">Start tournament</button>
+                                </span>
                                 </div>
                             </form>
                         </div>
@@ -119,10 +142,16 @@
         </div>
     </div>
 
-
 {% endblock %}
 {% block scripts %}
     <script>
+
+        function delete_tournament() {
+            if (!confirm("Are you sure you want to delete this tournament?")) {
+                return;
+            }
+            window.location = '/tournament/delete/{{ data.db_id }}'
+        }
 
         const MATCH_BOX_HEIGTH = 40;
         const MATCH_BOX_WIDTH = 150;

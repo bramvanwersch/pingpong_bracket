@@ -31,20 +31,6 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='TournamentGame',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('match_id', models.UUIDField(default=None, null=True)),
-                ('start_date', models.DateField()),
-                ('end_date', models.DateField()),
-                ('round_number', models.IntegerField(default=None, null=True)),
-                ('round', models.IntegerField(default=None, null=True)),
-            ],
-            options={
-                'db_table': 'tournament_game',
-            },
-        ),
-        migrations.CreateModel(
             name='TournamentParticipant',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
