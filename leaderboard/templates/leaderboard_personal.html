@@ -2,8 +2,11 @@
 {% load static %}
 {% block js-packages %}
     <script type="text/javascript" src="{% static "js-packages/chart.js" %}"></script>
+    <script src="{% static 'js-packages/select2.full.min.js' %}" type="text/javascript">
+    </script>
 {% endblock %}
 {% block css %}
+    <link rel="stylesheet" href="{% static 'css-package/select2.min.css' %}">
     <link rel="stylesheet" href="{% static "css/profile_picture.css" %}">
 {% endblock %}
 {% block app %}
@@ -17,7 +20,7 @@
         </div>
         <div style="flex: 45%">
             <label for="compare" style="margin-right: 5px; color: var(--main-color)">Compare to: </label>
-            <select id="compare" style="margin-right: 10px;">
+            <select id="compare" style="margin-right: 10px; width: 200px">
                 {% for name in names %}
                     <option value="{{ name }}">
                         {{ name }}
@@ -113,7 +116,7 @@
     <h3 style="color: var(--main-color)">
         Recent matches
     </h3>
-    <table id="leaderboard_personal_table">
+    <table id="leaderboard_personal_table" style="width: 100%">
         <thead>
         <tr>
             <th style="color: white;">
@@ -189,16 +192,10 @@
 {% block scripts %}
     <script>
         $(document).ready(function () {
-            var table = $('#leaderboard_personal_table').DataTable({
-                "pageLength": 7,
-                "lengthChange": false,
-                "order": [],
-                "dom": 'lrtip'
+            make_graph();
+            $('#compare').select2({
+                placeholder: "Choose a person"
             });
-            $('.search-input').on('keyup', function () {
-                table.search(this.value).draw();
-            });
-            make_graph()
         });
 
         function delete_entry(db_id) {

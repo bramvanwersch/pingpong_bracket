@@ -1,17 +1,24 @@
 {% extends 'app.html' %}
-
+{% load static %}
+{% block js-packages %}
+    <script src="{% static 'js-packages/select2.full.min.js' %}" type="text/javascript">
+    </script>
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css-package/select2.min.css' %}">
+{% endblock %}
 {% block app %}
     <div>
         <!-- Header Section -->
         <h2 style="color: var(--main-color)">Home</h2>
         <hr>
         <!-- Flex container for form and table -->
-        <div style="display: flex; justify-content: flex-start; align-items: center; margin-top: 40px;">
+        <div style="display: flex; justify-content: flex-start; margin-top: 40px; width: 100%">
             <!-- Form Section -->
 
             <!-- Table Section -->
-            <div style="flex: 2;">
-                <table id="matches_table">
+            <div style="flex-grow: 1">
+                <table id="matches_table" style="width: 100%">
                     <thead>
                     <tr>
                         <th style="color: white;"><span>Match</span></th>
@@ -46,7 +53,7 @@
                     <div>
                         <label for="oponent" style="margin-right: 5px; color: var(--main-color)">Opponent:</label>
                         <hr>
-                        <select id="oponent" name="oponent">
+                        <select id="oponent" name="oponent" style="width: 200px">
                             {% for name in names %}
                                 <option value="{{ name }}">{{ name }}</option>
                             {% endfor %}
@@ -75,21 +82,12 @@
         </div>
     </div>
 
-
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"/>
-    <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+{% endblock %}
+{% block scripts %}
     <script>
         $(document).ready(function () {
-            var table = $('#matches_table').DataTable({
-                "pageLength": 12,
-                "lengthChange": false,
-                "order": [],
-                "dom": 'lrtip'
-            });
-            $('.search-input').on('keyup', function () {
-                table.search(this.value).draw();
+            $('#oponent').select2({
+                placeholder: "Choose a person"
             });
         });
     </script>

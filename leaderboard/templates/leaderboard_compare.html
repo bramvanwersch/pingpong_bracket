@@ -164,7 +164,7 @@
             Recent matches of {{ profile.name }} vs {{ other_profile.name }}
         </h3>
     {% endif %}
-    <table id="compare_match_table">
+    <table id="compare_match_table" style="width: 100%;">
         <thead>
         <tr>
             <th style="color: white;">
@@ -223,19 +223,4 @@
         {% endfor %}
         </tbody>
     </table>
-{% endblock %}
-{% block scripts %}
-    <script>
-        $(document).ready(function () {
-            var table = $('#compare_match_table').DataTable({
-                "pageLength": 7,
-                "lengthChange": false,
-                "order": [],
-                "dom": 'lrtip'
-            });
-            $('.search-input').on('keyup', function () {
-                table.search(this.value).draw();
-            });
-        });
-    </script>
 {% endblock %}
