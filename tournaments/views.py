@@ -1,5 +1,6 @@
 import datetime
 import random
+from collections import defaultdict
 from typing import List
 
 from django.shortcuts import redirect
@@ -7,6 +8,7 @@ from django.template.response import TemplateResponse
 
 from chatting.src import utility as chatting_utility
 from general_src.base_view import BaseView
+from scoreboard.models import MatchResult
 from tournaments.models import Tournament, TournamentGame, TournamentParticipant
 from tournaments.src import utility
 
@@ -138,15 +140,39 @@ class TournamentDetailView(BaseView):
     def get(self, request, tournament_id):
         tournament = Tournament.objects.get(pk=tournament_id)
         data = utility.tournament_table_data([tournament])[0]
+        games = list(TournamentGame.objects.filter(tournament=tournament_id).select_related("player1", "player2"))
+        matches = MatchResult.objects.filter(match_id__in=[g.match_id for g in games])
+        matches_map = defaultdict(list)
+        for match in matches:
+            matches_map[match.match_id].append(match)
         game_data = []
-        # games = list(TournamentGame.objects.filter(tournament=tournament_id))
-        # matches = MatchResult.objects.filter(match_id__in=[g.match_id for g in games])
-        # for game in games:
-        #     game_data.append({""})
+        for game in games:
+            m1, m2 = matches_map.get(game.match_id, [None, None])
+            if m1 or m2 is None:
+                p1_score = 0
+                p2_score = 0
+            else:
+                if m1.player_id == game.player1.pk:
+                    p1_score = m1.player_score
+                    p2_score = m2.player_score
+                else:
+                    p1_score = m2.player_score
+                    p2_score = m1.player_score
+            game_data.append(
+                {
+                    "player1": game.player1,
+                    "player2": game.player2,
+                    "p1_score": p1_score,
+                    "p2_score": p2_score,
+                    "dummy": game.is_dummy,
+                }
+            )
         issue = ""
         if "issue" in request.session:
             issue = request.session.pop("issue")
-        return TemplateResponse(request, "tournaments_detail.html", {"data": data, "issue": issue, "games": game_data})
+        return TemplateResponse(
+            request, "tournaments_detail.html", {"data": data, "issue": issue, "elimination_games": game_data}
+        )
 
 
 class LeaveTournamentView(BaseView):

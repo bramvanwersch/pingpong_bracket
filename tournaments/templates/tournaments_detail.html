@@ -9,8 +9,10 @@
         <hr>
         <div style="display: flex">
             <div style="margin-right: 30px; max-width: 300px;">
-                {% for game in games %}
-
+                {% for game in elimination_games %}
+                    <div>
+                        {{ game }}
+                    </div>
                 {% endfor %}
             </div>
             <div style="height: 800px; flex-grow: 1;" id="canvas-parent">
