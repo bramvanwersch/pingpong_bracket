@@ -2,25 +2,16 @@
 {% load static %}
 
 {% block app %}
-    <div style="height: 100%">
+    <div style="height: 100%; display: flex; flex-direction: column">
         <h2 style="color: var(--main-color)">
             Tournament: {{ data.name }}
         </h2>
-        <hr>
-        <div style="display: flex">
-            <div style="margin-right: 30px; max-width: 300px;">
-                {% for game in elimination_games %}
-                    <div>
-                        {{ game }}
-                    </div>
-                {% endfor %}
-            </div>
-            <div style="height: 800px; flex-grow: 1;" id="canvas-parent">
-                <canvas id="tournament-display" height="500" width="500"
-                        style="background-color: lightgrey;border-radius: 20px">
-                </canvas>
-            </div>
-            <div style="margin-left: 30px; max-width: 300px">
+        <div>
+            <hr>
+
+        </div>
+        <div style="display: flex; flex-grow: 1">
+            <div style="margin-right: 30px; max-width: 300px">
                 <div style="width: 300px">
                     <table style="width: 100%">
                         <thead>
@@ -141,6 +132,43 @@
                     {% endif %}
                 {% endif %}
             </div>
+            <div style="flex-grow: 1; display: flex; flex-direction: column">
+                <div>
+
+                </div>
+                <div style="height: 100%" id="canvas-parent">
+                    <canvas id="tournament-display" height="500" width="500"
+                            style="background-color: lightgrey;border-radius: 20px">
+                    </canvas>
+                </div>
+            </div>
+            <div style="margin-left: 30px; max-width: 300px;">
+                <div style="width: 300px">
+                    <table style="width: 100%">
+                        <thead>
+                        <tr>
+                            <th style="color: white; text-align: center" colspan="2">
+                                Games
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for game in elimination_games %}
+                            {% if game.dummy == 'false' %}
+                                <tr>
+                                    <td>
+                                        {{ game.player1 }} vs {{ game.player2 }}
+                                    </td>
+                                    <td>
+                                        {{ game.p1_score }} - {{ game.p2_score }}
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -168,33 +196,39 @@
                 this.round_number = data.round_number;
                 this.round = data.round;
                 this.rect = null;
+                this.dummy = data.dummy === 'true';
             }
         }
 
         let CANVAS = null;
         let CONTEXT = null;
         let CANVAS_PARENT = null;
-        let nodes = []
-        let round = 1;
 
         // dragging
         let translate = [0, 0]
         let is_draggin = false;
         let drag_start = [0, 0];
         let selected_player = null;
-        for (let nr of [16, 8, 4, 2, 1]) {
-            for (let j = 0; j < nr; j++) {
-                nodes.push(new Node({
-                    "player1": "player1",
-                    "player2": "player2",
-                    "round_number": j + 1,
-                    "round": round,
-                    "p1_score": 0,
-                    "p2_score": 2
-                }))
-            }
-            round += 1;
+
+        let nodes = []
+        for (let game of {{ elimination_games | safe }}) {
+            nodes.push(new Node(game))
         }
+        // let round = 1;
+        // for (let nr of [16, 8, 4, 2, 1]) {
+        //     for (let j = 0; j < nr; j++) {
+        //         nodes.push(new Node({
+        //             "player1": "player1",
+        //             "player2": "player2",
+        //             "round_number": j + 1,
+        //             "round": round,
+        //             "p1_score": 0,
+        //             "p2_score": 2
+        //         }))
+        //     }
+        //     round += 1;
+        // }
+
         let node_map = new Map();
         let max_round = 0;
         // NOTE: reliant on the order of input nodes
@@ -216,6 +250,9 @@
                 const y = e.clientY - rect.top + translate[1];
                 drag_start = [x, y];
                 for (let node of nodes) {
+                    if (node.dummy) {
+                        continue
+                    }
                     if (point_collides_with_rect(x, y, ...node.rect)) {
                         if (y < node.rect[1] + (node.rect[3] / 2)) {
                             selected_player = node.player1
@@ -247,7 +284,8 @@
 
         function loop() {
             CANVAS.width = CANVAS_PARENT.clientWidth;
-            CANVAS.height = CANVAS_PARENT.clientHeight;
+            CANVAS.height = CANVAS_PARENT.clientHeight - 10;
+            console.log(CANVAS.height)
             draw_bracket();
             requestAnimationFrame(loop)
         }
@@ -261,12 +299,17 @@
             let x = 10;
 
             CONTEXT.translate(-translate[0], -translate[1])
+            CONTEXT.font = "13px Arial";
             for (let i = 1; i <= max_round; i++) {
                 let round_nodes = node_map.get(i);
                 let vertical_space = total_heigth / round_nodes.length;
                 let y = vertical_space / 2;
                 let go_up = false;
+                CONTEXT.fillText(`Round ${i}`, x + MATCH_BOX_WIDTH / 2 - 30, Math.min(20, y - 30));
                 for (let node of round_nodes) {
+                    if (node.dummy) {
+                        continue
+                    }
                     node.rect = [x, y - MATCH_BOX_HEIGTH / 2, MATCH_BOX_WIDTH, MATCH_BOX_HEIGTH];
                     CONTEXT.roundRect(...node.rect, 5);
                     CONTEXT.stroke()
@@ -275,7 +318,6 @@
                     CONTEXT.lineTo(x + MATCH_BOX_WIDTH - 8, y)
                     CONTEXT.moveTo(x + MATCH_BOX_WIDTH - 28, y - MATCH_BOX_HEIGTH / 2 + 5)
                     CONTEXT.lineTo(x + MATCH_BOX_WIDTH - 28, y + MATCH_BOX_HEIGTH / 2 - 5)
-                    CONTEXT.font = "13px Arial";
                     if (selected_player === node.player1) {
                         CONTEXT.fillStyle = SELECTED_PLAYER_COLOR;
                     }

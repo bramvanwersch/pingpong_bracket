@@ -140,7 +140,11 @@ class TournamentDetailView(BaseView):
     def get(self, request, tournament_id):
         tournament = Tournament.objects.get(pk=tournament_id)
         data = utility.tournament_table_data([tournament])[0]
-        games = list(TournamentGame.objects.filter(tournament=tournament_id).select_related("player1", "player2"))
+        games = list(
+            TournamentGame.objects.filter(tournament=tournament_id)
+            .select_related("player1", "player2")
+            .order_by("-end_date", "round_number")
+        )
         matches = MatchResult.objects.filter(match_id__in=[g.match_id for g in games])
         matches_map = defaultdict(list)
         for match in matches:
@@ -160,11 +164,13 @@ class TournamentDetailView(BaseView):
                     p2_score = m1.player_score
             game_data.append(
                 {
-                    "player1": game.player1,
-                    "player2": game.player2,
+                    "player1": game.player1.username if game.player1 is not None else "tbd",
+                    "player2": game.player2.username if game.player2 is not None else "tbd",
                     "p1_score": p1_score,
                     "p2_score": p2_score,
-                    "dummy": game.is_dummy,
+                    "round_number": game.round_number,
+                    "round": game.round,
+                    "dummy": str(game.is_dummy).lower(),
                 }
             )
         issue = ""
