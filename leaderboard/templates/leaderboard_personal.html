@@ -231,15 +231,10 @@
         }
 
         function loadFile() {
-            let image = document.getElementById("output");
-            let profile_picture = document.getElementById("profile_picture");
+
             let file_input = $("#file")
-            let url = URL.createObjectURL(file_input[0].files[0]);
-            image.src = url;
-            profile_picture.src = url;
             let formData = new FormData();
             formData.append('file', file_input[0].files[0]);
-
             $.ajax({
                 url: '/api/login/upload_image',
                 type: 'POST',
@@ -250,6 +245,14 @@
                     xhr.setRequestHeader("X-CSRFToken", Cookies.get("csrftoken"));
                 },
                 success: function (data) {
+                    let image = document.getElementById("output");
+                    let profile_picture = document.getElementById("profile_picture");
+                    let url = URL.createObjectURL(file_input[0].files[0]);
+                    image.src = url;
+                    profile_picture.src = url;
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                   $.notify(XMLHttpRequest.responseText);
                 }
             });
         }
