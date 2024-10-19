@@ -11,52 +11,117 @@
 {% endblock %}
 
 {% block app %}
-    <div style="display: flex; height: 100%">
-        <div style="width: 30%; height: 100%; word-break: break-word; margin-bottom: 20px">
-            <div style="display: flex; flex-direction: column; margin-right: 10px; height: calc(100% - 20px);">
-                <div style="color: var(--main-color); display: flex; margin-bottom: 10px;">
-                    <select id="chat_room" name="chatter" style="flex-grow: 1" multiple="multiple">
-                        {% for name, id in names.items %}
-                            <option value="{{ id }}">
-                                {{ name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                    <button onclick="create_chat_room()">Start chatting</button>
-                </div>
-                <div style="flex-grow: 1; border: 2px solid var(--main-color); border-radius: 5px; overflow: auto">
-                    {% for data in group_data %}
-                        <div style="padding: 5px; margin: 5px; border: 1px solid var(--main-color); color: var(--main-color); border-radius: 5px; cursor: pointer; position: relative"
-                             class="chat_selector {% if data.db_id == group_id %}selected{% endif %}"
-                             onclick="open_chat({{ data.db_id }})">
-                            {{ data.name }}
-                            {% if data.nr_unread > 0 %}
-                                <div class="numberCircle" id="notification-nr"
-                                     style="position: absolute; top: 2px; right: 2px; color: grey">
-                                    {{  data.nr_unread }}
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                </div>
+    <div class="center">
+        <div class="contacts">
+            <i class="fas fa-bars fa-2x"></i>
+            <h2>Contacts</h2>
+            <div class="contact">
+                <div class="pic rogers"></div>
+                <div class="badge">14</div>
+                <div class="name">Steve Rogers</div>
+                <div class="message">That is America's ass 🇺🇸🍑</div>
+            </div>
+            <div class="contact">
+                <div class="pic stark"></div>
+                <div class="name">Tony Stark</div>
+                <div class="message">Uh, he's from space, he came here to steal a necklace from a wizard.</div>
+            </div>
+            <div class="contact">
+                <div class="pic banner"></div>
+                <div class="badge">1</div>
+                <div class="name">Bruce Banner</div>
+                <div class="message">There's an Ant-Man *and* a Spider-Man?</div>
+            </div>
+            <div class="contact">
+                <div class="pic thor"></div>
+                <div class="name">Thor Odinson</div>
+                <div class="badge">3</div>
+                <div class="message">I like this one</div>
+            </div>
+            <div class="contact">
+                <div class="pic danvers"></div>
+                <div class="badge">2</div>
+                <div class="name">Carol Danvers</div>
+                <div class="message">Hey Peter Parker, you got something for me?</div>
             </div>
         </div>
-        <div style="width: 70%; margin-bottom: 20px">
-            <div style="display: flex; flex-direction: column; height: 100%;">
-                <h2 id="chat-title" style="text-align: center; color: var(--main-color)">
-                </h2>
-                <div style="flex-grow: 1; border: 2px solid var(--main-color);border-radius: 5px; margin-bottom: 5px; margin-top: 10px; overflow-y: auto; display: flex; flex-direction: column-reverse"
-                     id="messages_div">
-                </div>
-                <div>
-                    <div style="display: flex; width: 100%">
-                        <input type="text" style="flex-grow: 1" id="message_box" autofocus>
-                        <button onclick="send_message()">Send</button>
+        <div class="chat">
+            <div class="contact bar">
+                <div class="pic stark"></div>
+                <div class="name">Tony Stark</div>
+                <div class="seen">Today at 12:56</div>
+            </div>
+            <div id="chat">
+                <div class="messages">
+                    <div class="time">Today at 11:41</div>
+                    <div class="message parker">Hey, man! What's up, Mr Stark? 👋</div>
+                    <div class="message stark">Kid, where'd you come from?</div>
+                    <div class="message parker">Field trip! 🤣</div>
+                    <div class="message parker">Uh, what is this guy's problem, Mr. Stark? 🤔</div>
+                    <div class="message stark">Uh, he's from space, he came here to steal a necklace from a wizard.
+                    </div>
+                    <div class="message stark typing">
+                        <div class="typing typing-1"></div>
+                        <div class="typing typing-2"></div>
+                        <div class="typing typing-3"></div>
                     </div>
                 </div>
             </div>
+            <div class="input">
+                <i class="fas fa-camera"></i>
+                <i class="far fa-laugh-beam"></i>
+                <input type="text" placeholder="Type your message here!"/>
+                <i class="fas fa-microphone"></i>
+            </div>
         </div>
     </div>
+
+    {#    <div style="display: flex; height: 100%">#}
+    {#        <div style="width: 30%; height: 100%; word-break: break-word; margin-bottom: 20px">#}
+    {#            <div style="display: flex; flex-direction: column; margin-right: 10px; height: calc(100% - 20px);">#}
+    {#                <div style="color: var(--main-color); display: flex; margin-bottom: 10px;">#}
+    {#                    <select id="chat_room" name="chatter" style="flex-grow: 1" multiple="multiple">#}
+    {#                        {% for name, id in names.items %}#}
+    {#                            <option value="{{ id }}">#}
+    {#                                {{ name }}#}
+    {#                            </option>#}
+    {#                        {% endfor %}#}
+    {#                    </select>#}
+    {#                    <button onclick="create_chat_room()">Start chatting</button>#}
+    {#                </div>#}
+    {#                <div style="flex-grow: 1; border: 2px solid var(--main-color); border-radius: 5px; overflow: auto">#}
+    {#                    {% for data in group_data %}#}
+    {#                        <div style="padding: 5px; margin: 5px; border: 1px solid var(--main-color); color: var(--main-color); border-radius: 5px; cursor: pointer; position: relative"#}
+    {#                             class="chat_selector {% if data.db_id == group_id %}selected{% endif %}"#}
+    {#                             onclick="open_chat({{ data.db_id }})">#}
+    {#                            {{ data.name }}#}
+    {#                            {% if data.nr_unread > 0 %}#}
+    {#                                <div class="numberCircle" id="notification-nr"#}
+    {#                                     style="position: absolute; top: 2px; right: 2px; color: grey">#}
+    {#                                    {{  data.nr_unread }}#}
+    {#                                </div>#}
+    {#                            {% endif %}#}
+    {#                        </div>#}
+    {#                    {% endfor %}#}
+    {#                </div>#}
+    {#            </div>#}
+    {#        </div>#}
+    {#        <div style="width: 70%; margin-bottom: 20px">#}
+    {#            <div style="display: flex; flex-direction: column; height: 100%;">#}
+    {#                <h2 id="chat-title" style="text-align: center; color: var(--main-color)">#}
+    {#                </h2>#}
+    {#                <div style="flex-grow: 1; border: 2px solid var(--main-color);border-radius: 5px; margin-bottom: 5px; margin-top: 10px; overflow-y: auto; display: flex; flex-direction: column-reverse"#}
+    {#                     id="messages_div">#}
+    {#                </div>#}
+    {#                <div>#}
+    {#                    <div style="display: flex; width: 100%">#}
+    {#                        <input type="text" style="flex-grow: 1" id="message_box" autofocus>#}
+    {#                        <button onclick="send_message()">Send</button>#}
+    {#                    </div>#}
+    {#                </div>#}
+    {#            </div>#}
+    {#        </div>#}
+    {#    </div>#}
 
 {% endblock %}
 {% block scripts %}
@@ -119,7 +184,7 @@
 
         function send_message() {
             let message = message_box[0].value;
-            if (message === ''){
+            if (message === '') {
                 return;
             }
             chatSocket.send(JSON.stringify({
