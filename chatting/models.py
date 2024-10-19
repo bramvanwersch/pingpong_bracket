@@ -47,6 +47,7 @@ class ChatMessage(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sender")
     chat_group = models.ForeignKey(ChatGroup, on_delete=models.CASCADE)
     receivers = models.ManyToManyField(User, through="chatting.UserMessage", related_name="receivers")
+    image = models.ImageField(null=True, default=None, upload_to="message_pictures")
 
 
 class UserMessage(models.Model):

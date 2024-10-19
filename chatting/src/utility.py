@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Dict, List
 
 from asgiref.sync import async_to_sync
@@ -36,12 +35,9 @@ def get_group_data(requesting_user: User) -> List[Dict[str, str]]:
     return group_data
 
 
-def send_message(message: str, sender: User, group_id: str):
+def send_message(chat_message: ChatMessage, sender: User, group_id: str):
     # also through the websocket
     other_users = [cgu.user_id for cgu in ChatGroupUser.objects.filter(group_id=group_id)]
-    chat_message = ChatMessage.objects.create(
-        message=message, sender=sender, date=datetime.now(), chat_group_id=group_id
-    )
     for user_id in other_users:
         UserMessage.objects.create(message=chat_message, message_read=user_id == sender.pk, user_id=user_id)
     channel_layer = get_channel_layer("default")
@@ -50,6 +46,7 @@ def send_message(message: str, sender: User, group_id: str):
         {
             "type": "send_message",
             "message": chat_message.message,
+            "image_url": chat_message.image.url if chat_message.image else "",
             "username": chat_message.sender.username,
             "date": chat_message.date.strftime("%Y-%m-%d %H:%M:%S"),
         },

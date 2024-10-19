@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth.models import User
 from django.db.models.functions import Lower
 from django.shortcuts import redirect
@@ -16,7 +18,7 @@ class ChatRoomView(BaseView):
             user_ids = {cgu.user.pk for cgu in ChatGroupUser.objects.filter(group_id=group_id)}
             if request.user.pk not in user_ids:
                 return TemplateResponse(request, "403.html")
-        messages = ChatMessage.objects.filter(chat_group_id=group_id).order_by("date")
+        messages = ChatMessage.objects.filter(chat_group_id=group_id).order_by("date")[:50]
         # read all the messages when opening a chat
         UserMessage.objects.filter(message__chat_group_id=group_id, user=request.user, message_read=False).update(
             message_read=True
@@ -26,6 +28,7 @@ class ChatRoomView(BaseView):
             formatted_messages.append(
                 {
                     "message": message.message,
+                    "image_url": message.image.url if message.image else "",
                     "username": message.sender.username,
                     "date": message.date.strftime("%Y-%m-%d %H:%M:%S"),
                 }
@@ -55,5 +58,11 @@ class ChatChallengeView(BaseView):
     def get(self, request, user_name: str):
         challenge_user = User.objects.get(username=user_name)
         group = ChatGroup.create_or_get_group(request.user, [challenge_user])
-        utility.send_message("I challenge you to a match!", request.user, f"{group.id}")
+        message = ChatMessage.objects.create(
+            message="I challenge you to a match!",
+            sender=request.user,
+            chat_group_id=group.pk,
+            date=datetime.datetime.now(),
+        )
+        utility.send_message(message, request.user, f"{group.id}")
         return redirect(f"/chatroom/{group.pk}")

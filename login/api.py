@@ -3,9 +3,8 @@ import os
 from django.http import HttpResponse, JsonResponse
 from rest_framework.views import APIView
 
+from general_src import image_handling
 from login.models import UserData
-
-ALLOWED_IMAGE_FORMATS = {"jpg", "png", "gif", "webm", "webp", "apng", "svg", "avif"}
 
 
 class UploadLoginImage(APIView):
@@ -13,13 +12,11 @@ class UploadLoginImage(APIView):
         user_data = UserData.objects.get(user=request.user)
         file = request.FILES["file"]
         try:
-            extension = file.name.rsplit(".", 1)[1]
-        except IndexError:
-            return HttpResponse("Unsupported image format", status=400)
-        if extension not in ALLOWED_IMAGE_FORMATS:
-            return HttpResponse("Unsupported image format", status=400)
+            image_handling.verify_image(file)
+        except RuntimeError as e:
+            return HttpResponse(str(e), status=400)
         os.remove(user_data.profile_picture.path)
-        user_data.profile_picture = request.FILES["file"]
+        user_data.profile_picture = file
         user_data.save()
         return HttpResponse()
 

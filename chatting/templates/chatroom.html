@@ -9,6 +9,14 @@
     <link rel="stylesheet" href="{% static 'css-package/select2.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/chatting.css' %}">
 {% endblock %}
+{% block styles %}
+    <style>
+        {#little fricky wicky#}
+        .projects-section {
+            height: 100%;
+        }
+    </style>
+{% endblock %}
 
 {% block app %}
     <div style="display: flex; height: 100%">
@@ -51,6 +59,16 @@
                 <div>
                     <div style="display: flex; width: 100%">
                         <input type="text" style="flex-grow: 1" id="message_box" autofocus>
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input id="message_upload" type="file" onchange="send_image()" style="display: none"/>
+                            <div title="Send an image" style="cursor: pointer;" onclick="open_upload()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                     class="bi bi-paperclip" viewBox="0 0 16 16">
+                                    <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0z"/>
+                                </svg>
+                            </div>
+                        </form>
                         <button onclick="send_message()">Send</button>
                     </div>
                 </div>
@@ -117,30 +135,64 @@
             })
         }
 
-        function send_message() {
+        function send_message(db_id = null) {
             let message = message_box[0].value;
-            if (message === '') {
+            if (message === '' && db_id === null) {
                 return;
             }
             chatSocket.send(JSON.stringify({
                 message: message,
+                db_id: db_id,
                 user_id: user_id,
                 group_id: group_id
             }));
             message_box[0].value = "";
         }
 
-        function add_message(message_data) {
-            let words = [];
-            for (let word of message_data.message.split(" ")) {
-                if (_is_url(word)) {
-                    words.push(`<a href="${word}">${word}</a>`)
-                } else {
-                    words.push(word)
+        function open_upload() {
+            $("#message_upload").trigger('click');
+        }
+
+        function send_image() {
+            let file_input = $("#message_upload")
+            let formData = new FormData();
+            formData.append('file', file_input[0].files[0]);
+            $.ajax({
+                url: '/api/chatting/send_image/' + group_id,
+                type: 'POST',
+                data: formData,
+                processData: false,  // tell jQuery not to process the data
+                contentType: false,  // tell jQuery not to set contentType
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", Cookies.get("csrftoken"));
+                },
+                success: function (data) {
+                    send_message(data.db_id)
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    $.notify(XMLHttpRequest.responseText);
                 }
+            });
+        }
+
+        function add_message(message_data) {
+            console.log(message_data);
+            if (message_data.image_url === ""){
+                let words = [];
+                for (let word of message_data.message.split(" ")) {
+                    if (_is_url(word)) {
+                        words.push(`<a href="${word}">${word}</a>`)
+                    } else {
+                        words.push(word)
+                    }
+                }
+                let message = words.join(" ");
+                messages_div.prepend(`<div style='word-wrap: break-word; color: var(--main-color)'><b><a href='/leaderboard/${message_data.username}' style="color: var(--main-color)">${message_data.username}</a> (${message_data.date})</b>: ${message}</div>`)
             }
-            let message = words.join(" ");
-            messages_div.prepend(`<div style='word-wrap: break-word; color: var(--main-color)'><b><a href='/leaderboard/${message_data.username}' style="color: var(--main-color)">${message_data.username}</a> (${message_data.date})</b>: ${message}</div>`)
+            else{
+                messages_div.prepend(`<div style='word-wrap: break-word; color: var(--main-color)'><b><a href='/leaderboard/${message_data.username}' style="color: var(--main-color)">${message_data.username}</a> (${message_data.date})</b>: <img src="${message_data.image_url}"></div>`)
+            }
+
         }
 
         function _is_url(string) {

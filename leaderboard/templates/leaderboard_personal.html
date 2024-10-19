@@ -46,8 +46,8 @@
                             <span>Change Image</span>
                         </label>
                         <form method="post" enctype="multipart/form-data">
-                            {% csrf_token %} {{ form.as_p }}
-                            <input id="file" type="file" onchange="loadFile(event)"/>
+                            {% csrf_token %}
+                            <input id="file" type="file" onchange="loadFile()"/>
                         </form>
                     {% endif %}
                     <img src="{{ profile.image_url }}" id="output" width="100"/>
@@ -231,7 +231,6 @@
         }
 
         function loadFile() {
-
             let file_input = $("#file")
             let formData = new FormData();
             formData.append('file', file_input[0].files[0]);
