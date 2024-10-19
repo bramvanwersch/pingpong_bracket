@@ -33,7 +33,7 @@
                             {% if data.nr_unread > 0 %}
                                 <div class="numberCircle" id="notification-nr"
                                      style="position: absolute; top: 2px; right: 2px; color: grey">
-                                    {{  data.nr_unread }}
+                                    {{ data.nr_unread }}
                                 </div>
                             {% endif %}
                         </div>
@@ -119,7 +119,7 @@
 
         function send_message() {
             let message = message_box[0].value;
-            if (message === ''){
+            if (message === '') {
                 return;
             }
             chatSocket.send(JSON.stringify({
@@ -131,7 +131,25 @@
         }
 
         function add_message(message_data) {
-            messages_div.prepend(`<div style='word-wrap: break-word; color: var(--main-color)'><b><a href='/leaderboard/${message_data.username}' style="color: var(--main-color)">${message_data.username}</a> (${message_data.date})</b>: ${message_data.message}</div>`)
+            let words = [];
+            for (let word of message_data.message.split(" ")) {
+                if (_is_url(word)) {
+                    words.push(`<a href="${word}">${word}</a>`)
+                } else {
+                    words.push(word)
+                }
+            }
+            let message = words.join(" ");
+            messages_div.prepend(`<div style='word-wrap: break-word; color: var(--main-color)'><b><a href='/leaderboard/${message_data.username}' style="color: var(--main-color)">${message_data.username}</a> (${message_data.date})</b>: ${message}</div>`)
+        }
+
+        function _is_url(string) {
+            try {
+                new URL(string);
+            } catch {
+                return false;
+            }
+            return true;
         }
 
         function create_chat_room() {
