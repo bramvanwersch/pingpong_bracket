@@ -49,7 +49,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def _create_chat_message(self, message: str, sender: str, group_id: str):
         sender = User.objects.get(pk=sender)
         chat_message = ChatMessage.objects.create(
-            message=message, sender=sender, date=datetime.datetime.now(), chat_group_id=group_id
+            message=message.strip("\n"), sender=sender, date=datetime.datetime.now(), chat_group_id=group_id
         )
         utility.send_message(chat_message, sender, group_id)
 

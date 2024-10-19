@@ -58,7 +58,7 @@
                 </div>
                 <div>
                     <div style="display: flex; width: 100%">
-                        <input type="text" style="flex-grow: 1" id="message_box" autofocus>
+                        <textarea type="text" style="flex-grow: 1" id="message_box" autofocus></textarea>
                         <form method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             <input id="message_upload" type="file" onchange="send_image()" style="display: none"/>
@@ -129,7 +129,7 @@
             }
 
             message_box.on("keypress", function (event) {
-                if (event.originalEvent.key === "Enter") {
+                if (event.originalEvent.key === "Enter" && event.ctrlKey) {
                     send_message();
                 }
             })
@@ -176,20 +176,26 @@
         }
 
         function add_message(message_data) {
-            console.log(message_data);
-            if (message_data.image_url === ""){
-                let words = [];
-                for (let word of message_data.message.split(" ")) {
-                    if (_is_url(word)) {
-                        words.push(`<a href="${word}">${word}</a>`)
-                    } else {
-                        words.push(word)
+            if (message_data.image_url === "") {
+                let is_first = true;
+                for (let line of message_data.message.split("\n")) {
+                    let words = [];
+                    for (let word of line.split(" ")) {
+                        if (_is_url(word)) {
+                            words.push(`<a href="${word}">${word}</a>`)
+                        } else {
+                            words.push(word)
+                        }
                     }
+                    let message = words.join(" ");
+                    if (is_first){
+                        messages_div.prepend(`<div style='word-wrap: break-word; color: var(--main-color)'><b><a href='/leaderboard/${message_data.username}' style="color: var(--main-color)">${message_data.username}</a> (${message_data.date}): </b> ${message}</div>`)
+                    }else{
+                        messages_div.prepend(`<div style='word-wrap: break-word; color: var(--main-color)'><b style="visibility: hidden"><a href='/leaderboard/${message_data.username}' style="color: var(--main-color); visibility: hidden">${message_data.username}</a>(${message_data.date}): </b> ${message}</div>`)
+                    }
+                    is_first = false;
                 }
-                let message = words.join(" ");
-                messages_div.prepend(`<div style='word-wrap: break-word; color: var(--main-color)'><b><a href='/leaderboard/${message_data.username}' style="color: var(--main-color)">${message_data.username}</a> (${message_data.date})</b>: ${message}</div>`)
-            }
-            else{
+            } else {
                 messages_div.prepend(`<div style='word-wrap: break-word; color: var(--main-color)'><b><a href='/leaderboard/${message_data.username}' style="color: var(--main-color)">${message_data.username}</a> (${message_data.date})</b>: <img src="${message_data.image_url}"></div>`)
             }
 
