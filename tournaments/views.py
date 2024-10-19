@@ -1,6 +1,5 @@
 import datetime
 import random
-from collections import defaultdict
 from typing import List
 
 from django.shortcuts import redirect
@@ -8,7 +7,6 @@ from django.template.response import TemplateResponse
 
 from chatting.src import utility as chatting_utility
 from general_src.base_view import BaseView
-from scoreboard.models import MatchResult
 from tournaments.models import Tournament, TournamentGame, TournamentParticipant
 from tournaments.src import utility
 
@@ -98,7 +96,7 @@ class StartTournamentView(BaseView):
         round_data = {}
         for power, round_nr in enumerate(range(nr_rounds, 0, -1)):
             nr_games = 2**power
-            round_end_date = end_date - datetime.timedelta(days=(round_nr - 1) * days_per_round)
+            round_end_date = end_date - datetime.timedelta(days=(nr_rounds - round_nr - 1) * days_per_round)
             round_data[round_nr] = []
             for game_nr in range(1, nr_games + 1):
                 game = TournamentGame.objects.create(
@@ -111,8 +109,9 @@ class StartTournamentView(BaseView):
                 round_data[round_nr].append(game)
         missing = 2**nr_rounds - len(participants)
         current_participant = 0
+        # fill in round 2 partially if not a power of 2
         while current_participant < missing:
-            game = round_data[2][missing - current_participant - 1]
+            game = round_data[2][len(round_data[2]) - int(current_participant / 2) - 1]
             game.player1 = participants[current_participant]
             current_participant += 1
             if current_participant >= missing:
@@ -121,6 +120,8 @@ class StartTournamentView(BaseView):
             game.player2 = participants[current_participant]
             current_participant += 1
             game.save()
+
+        # fill in the rest of the players
         count = 0
         while current_participant < len(participants):
             game = round_data[1][count]
@@ -143,36 +144,9 @@ class TournamentDetailView(BaseView):
         games = list(
             TournamentGame.objects.filter(tournament=tournament_id)
             .select_related("player1", "player2")
-            .order_by("-end_date", "round_number")
+            .order_by("end_date", "round_number")
         )
-        matches = MatchResult.objects.filter(match_id__in=[g.match_id for g in games])
-        matches_map = defaultdict(list)
-        for match in matches:
-            matches_map[match.match_id].append(match)
-        game_data = []
-        for game in games:
-            m1, m2 = matches_map.get(game.match_id, [None, None])
-            if m1 or m2 is None:
-                p1_score = 0
-                p2_score = 0
-            else:
-                if m1.player_id == game.player1.pk:
-                    p1_score = m1.player_score
-                    p2_score = m2.player_score
-                else:
-                    p1_score = m2.player_score
-                    p2_score = m1.player_score
-            game_data.append(
-                {
-                    "player1": game.player1.username if game.player1 is not None else "tbd",
-                    "player2": game.player2.username if game.player2 is not None else "tbd",
-                    "p1_score": p1_score,
-                    "p2_score": p2_score,
-                    "round_number": game.round_number,
-                    "round": game.round,
-                    "dummy": str(game.is_dummy).lower(),
-                }
-            )
+        game_data = utility.get_tournament_match_details(games)
         issue = ""
         if "issue" in request.session:
             issue = request.session.pop("issue")

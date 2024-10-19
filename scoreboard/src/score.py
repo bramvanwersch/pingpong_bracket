@@ -1,9 +1,37 @@
+import datetime
 import math
+import uuid
 from typing import Tuple
 
 from login.models import UserData
 from scoreboard.models import MatchResult, Result
 from scoreboard.src import constants
+
+
+def record_match_results(
+    player1_data: UserData, player2_data: UserData, p1_score: int, p2_score: int
+) -> Tuple[MatchResult, MatchResult]:
+    match_id = uuid.uuid4()
+    score_player = MatchResult.objects.create(
+        player=player1_data.user,
+        opponent=player2_data.user,
+        player_score=p1_score,
+        opponents_score=p2_score,
+        date=datetime.datetime.now(),
+        rate_change=0.0,
+        match_id=match_id,
+    )
+    record_score(player1_data, player2_data, score_player)
+    score_player_2 = MatchResult.objects.create(
+        player=player2_data.user,
+        opponent=player1_data.user,
+        player_score=p2_score,
+        opponents_score=p1_score,
+        date=datetime.datetime.now(),
+        rate_change=-1 * score_player.rate_change,
+        match_id=match_id,
+    )
+    return score_player, score_player_2
 
 
 def record_score(player: UserData, opponent: UserData, match: MatchResult):

@@ -2,22 +2,21 @@
 {% load static %}
 
 {% block app %}
-    <div style="height: 100%; display: flex; flex-direction: column">
+    <div style="height: 100%;">
         <h2 style="color: var(--main-color)">
             Tournament: {{ data.name }}
         </h2>
         <div>
             <hr>
-
         </div>
-        <div style="display: flex; flex-grow: 1">
+        <div style="display: flex;">
             <div style="margin-right: 30px; max-width: 300px">
                 <div style="width: 300px">
                     <table style="width: 100%">
                         <thead>
                         <tr>
                             <th style="color: white; text-align: center" colspan="2">
-                                Information
+                                General information
                             </th>
                         </tr>
                         </thead>
@@ -36,6 +35,14 @@
                             </td>
                             <td>
                                 {{ data.tournament_type }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Creator:
+                            </td>
+                            <td>
+                                {{ data.creator }}
                             </td>
                         </tr>
                         <tr>
@@ -132,7 +139,7 @@
                     {% endif %}
                 {% endif %}
             </div>
-            <div style="flex-grow: 1; display: flex; flex-direction: column">
+            <div style="flex-grow: 1; display: flex; flex-direction: column; height: 800px">
                 <div>
 
                 </div>
@@ -142,32 +149,85 @@
                     </canvas>
                 </div>
             </div>
-            <div style="margin-left: 30px; max-width: 300px;">
-                <div style="width: 300px">
-                    <table style="width: 100%">
-                        <thead>
-                        <tr>
-                            <th style="color: white; text-align: center" colspan="2">
-                                Games
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for game in elimination_games %}
-                            {% if game.dummy == 'false' %}
-                                <tr>
-                                    <td>
-                                        {{ game.player1 }} vs {{ game.player2 }}
-                                    </td>
-                                    <td>
-                                        {{ game.p1_score }} - {{ game.p2_score }}
-                                    </td>
-                                </tr>
-                            {% endif %}
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+
+        </div>
+        <div style="margin-top: 30px;width: 100%;">
+            <div>
+                <table style="width: 100%">
+                    <thead>
+                    <tr>
+                        <th style="color: white;">
+                            Round
+                        </th>
+                        <th style="color: white;">
+                            Match
+                        </th>
+                        <th style="color: white;">
+                            Player 1
+                        </th>
+                        <th style="color: white;">
+                            Player 2
+                        </th>
+                        <th style="color: white;">
+                            Play until
+                        </th>
+                        <th style="color: white;">
+                            Score
+                        </th>
+                        <th style="color: white;">
+                            Result
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for game in elimination_games %}
+                        {% if game.dummy == 'false' %}
+                            <tr>
+                                <td>
+                                    {{ game.round }}
+                                </td>
+                                <td>
+                                    {{ game.round_number }}
+                                </td>
+                                <td>
+                                    {{ game.player1 }}
+                                </td>
+                                <td>
+                                    {{ game.player2 }}
+                                </td>
+                                <td>
+                                    {{ game.end_date }}
+                                </td>
+                                <td>
+                                    {% if game.result != 'tbd' or game.player1 == 'tbd' or game.player2 == 'tbd' %}
+                                        <input value="{{ game.p1_score }}" type="text" disabled
+                                               style="width: 25px; text-align: center">
+                                        -
+                                        <input value="{{ game.p2_score }}" type="text" disabled
+                                               style="width: 25px; text-align: center">
+                                    {% elif user == game.player1 or user == game.player2 or user == data.creator %}
+                                        <input value="{{ game.p1_score }}" type="text" id="{{ game.db_id }}_1"
+                                               style="width: 25px; text-align: center">
+                                        -
+                                        <input value="{{ game.p2_score }}" type="text" id="{{ game.db_id }}_2"
+                                               style="width: 25px; text-align: center">
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if game.result != 'tbd' or game.player1 == 'tbd' or game.player2 == 'tbd' %}
+                                        {{ game.result }}
+                                    {% else %}
+                                        <button onclick="submit_score({{ game.db_id }})">
+                                            submit
+                                        </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -183,9 +243,29 @@
             window.location = '/tournament/delete/{{ data.db_id }}'
         }
 
-        const MATCH_BOX_HEIGTH = 40;
+        function submit_score(db_id) {
+            let p1_score = $(`#${db_id}_1`).val()
+            let p2_score = $(`#${db_id}_2`).val()
+            $.ajax({
+                type: "POST",
+                url: '/api/tournament/add_score/' + db_id,
+                data: JSON.stringify({"p1_score": p1_score, "p2_score": p2_score}),
+                contentType: "application/json",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", Cookies.get("csrftoken"));
+                },
+                success: function (data) {
+                    window.location.reload();
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    $.notify(XMLHttpRequest.responseText);
+                }
+            });
+        }
+
+        const MATCH_BOX_HEIGHT = 40;
         const MATCH_BOX_WIDTH = 150;
-        const SELECTED_PLAYER_COLOR = '#ffef33'
+        const SELECTED_PLAYER_COLOR = '#00a7b3'
 
         class Node {
             constructor(data) {
@@ -206,7 +286,7 @@
 
         // dragging
         let translate = [0, 0]
-        let is_draggin = false;
+        let is_dragging = false;
         let drag_start = [0, 0];
         let selected_player = null;
 
@@ -243,12 +323,13 @@
         document.addEventListener('DOMContentLoaded', function () {
             CANVAS = document.getElementById("tournament-display");
             CANVAS.addEventListener('mousedown', (e) => {
-                is_draggin = true;
+                is_dragging = true;
                 const rect = CANVAS.getBoundingClientRect();
                 // canvas space coordinates
                 const x = e.clientX - rect.left + translate[0];
                 const y = e.clientY - rect.top + translate[1];
                 drag_start = [x, y];
+                selected_player = null;
                 for (let node of nodes) {
                     if (node.dummy) {
                         continue
@@ -265,7 +346,7 @@
             });
 
             CANVAS.addEventListener('mousemove', (e) => {
-                if (!is_draggin) return;
+                if (!is_dragging) return;
 
                 const rect = CANVAS.getBoundingClientRect();
                 const x = e.clientX - rect.left;
@@ -274,7 +355,7 @@
             });
 
             window.addEventListener('mouseup', () => {
-                is_draggin = false;
+                is_dragging = false;
             });
 
             CONTEXT = CANVAS.getContext("2d");
@@ -284,15 +365,14 @@
 
         function loop() {
             CANVAS.width = CANVAS_PARENT.clientWidth;
-            CANVAS.height = CANVAS_PARENT.clientHeight - 10;
-            console.log(CANVAS.height)
+            CANVAS.height = CANVAS_PARENT.clientHeight;
             draw_bracket();
             requestAnimationFrame(loop)
         }
 
         function draw_bracket() {
-            let min_heigth = node_map.get(1).length * (MATCH_BOX_HEIGTH + 10);
-            let total_heigth = Math.max(CANVAS.height, min_heigth);
+            let min_height = node_map.get(1).length * (MATCH_BOX_HEIGHT + 10);
+            let total_height = Math.max(CANVAS.height, min_height);
             let min_width = 20 + node_map.size * (MATCH_BOX_WIDTH + 20);
             let total_width = Math.max(CANVAS.width, min_width);
             let between_space = (total_width - MATCH_BOX_WIDTH * node_map.size) / (node_map.size)
@@ -302,7 +382,7 @@
             CONTEXT.font = "13px Arial";
             for (let i = 1; i <= max_round; i++) {
                 let round_nodes = node_map.get(i);
-                let vertical_space = total_heigth / round_nodes.length;
+                let vertical_space = total_height / round_nodes.length;
                 let y = vertical_space / 2;
                 let go_up = false;
                 CONTEXT.fillText(`Round ${i}`, x + MATCH_BOX_WIDTH / 2 - 30, Math.min(20, y - 30));
@@ -310,14 +390,14 @@
                     if (node.dummy) {
                         continue
                     }
-                    node.rect = [x, y - MATCH_BOX_HEIGTH / 2, MATCH_BOX_WIDTH, MATCH_BOX_HEIGTH];
+                    node.rect = [x, y - MATCH_BOX_HEIGHT / 2, MATCH_BOX_WIDTH, MATCH_BOX_HEIGHT];
                     CONTEXT.roundRect(...node.rect, 5);
                     CONTEXT.stroke()
                     CONTEXT.beginPath()
                     CONTEXT.moveTo(x + 8, y)
                     CONTEXT.lineTo(x + MATCH_BOX_WIDTH - 8, y)
-                    CONTEXT.moveTo(x + MATCH_BOX_WIDTH - 28, y - MATCH_BOX_HEIGTH / 2 + 5)
-                    CONTEXT.lineTo(x + MATCH_BOX_WIDTH - 28, y + MATCH_BOX_HEIGTH / 2 - 5)
+                    CONTEXT.moveTo(x + MATCH_BOX_WIDTH - 28, y - MATCH_BOX_HEIGHT / 2 + 5)
+                    CONTEXT.lineTo(x + MATCH_BOX_WIDTH - 28, y + MATCH_BOX_HEIGHT / 2 - 5)
                     if (selected_player === node.player1) {
                         CONTEXT.fillStyle = SELECTED_PLAYER_COLOR;
                     }
