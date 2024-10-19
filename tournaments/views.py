@@ -13,6 +13,7 @@ from tournaments.src import utility
 
 class TournamentMainView(BaseView):
     def get(self, request):
+        return TemplateResponse(request, "403.html", {"image_name": "403-troll.gif"})
         names = chatting_utility.get_user_mapping([request.user])
         types = [c[0] for c in Tournament.TournamentType.choices]
         tournament_objects = Tournament.objects.all().order_by("start_date")[:50]
@@ -23,7 +24,13 @@ class TournamentMainView(BaseView):
         return TemplateResponse(
             request,
             "tournaments_overview.html",
-            {"names": names, "issue": issue, "types": types, "tournament_data": tournament_data},
+            {
+                "names": names,
+                "issue": issue,
+                "types": types,
+                "tournament_data": tournament_data,
+                "current": "tournament",
+            },
         )
 
 
@@ -139,6 +146,7 @@ class StartTournamentView(BaseView):
 
 class TournamentDetailView(BaseView):
     def get(self, request, tournament_id):
+        return TemplateResponse(request, "403.html", {"image_name": "403-troll.gif"})
         tournament = Tournament.objects.get(pk=tournament_id)
         data = utility.tournament_table_data([tournament])[0]
         games = list(
@@ -151,7 +159,9 @@ class TournamentDetailView(BaseView):
         if "issue" in request.session:
             issue = request.session.pop("issue")
         return TemplateResponse(
-            request, "tournaments_detail.html", {"data": data, "issue": issue, "elimination_games": game_data}
+            request,
+            "tournaments_detail.html",
+            {"data": data, "issue": issue, "elimination_games": game_data, "current": "tournament"},
         )
 
 

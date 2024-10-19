@@ -1,8 +1,12 @@
 {% extends 'app.html' %}
 {% load static %}
-}
+
 {% block app %}
     <div style="height: 100%; width: 100%; font-size: 60px; display: flex; align-items: center; justify-content: center">
-        <img src="/static/images/403.gif" style="height: 100%; margin-bottom: 32px">
+        {% if image_name %}
+            <img src="/static/images/{{ image_name }}" style="height: 100%; margin-bottom: 32px">
+        {% else %}
+            <img src="/static/images/403.gif" style="height: 100%; margin-bottom: 32px">
+        {% endif %}
     </div>
 {% endblock %}
