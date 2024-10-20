@@ -13,7 +13,6 @@ from tournaments.src import utility
 
 class TournamentMainView(BaseView):
     def get(self, request):
-        return TemplateResponse(request, "403.html", {"image_name": "403-troll.gif"})
         names = chatting_utility.get_user_mapping([request.user])
         types = [c[0] for c in Tournament.TournamentType.choices]
         tournament_objects = Tournament.objects.all().order_by("start_date")[:50]
@@ -146,7 +145,6 @@ class StartTournamentView(BaseView):
 
 class TournamentDetailView(BaseView):
     def get(self, request, tournament_id):
-        return TemplateResponse(request, "403.html", {"image_name": "403-troll.gif"})
         tournament = Tournament.objects.get(pk=tournament_id)
         data = utility.tournament_table_data([tournament])[0]
         games = list(
