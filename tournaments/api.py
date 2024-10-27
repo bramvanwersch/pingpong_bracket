@@ -3,6 +3,7 @@ import math
 from django.http import HttpResponse
 from rest_framework.views import APIView
 
+from general_src import image_handling
 from login.models import UserData
 from scoreboard.models import MatchResult, Result
 from scoreboard.src.score import record_match_results
@@ -45,6 +46,7 @@ class SetGameScore(APIView):
             round=game.round + 1, round_number=math.ceil(game.round_number / 2), tournament_id=game.tournament_id
         ).first()
         if next_game is None:
+            # TODO: make sure that prizes are distributed and placements of players is done
             # should mean this was the final round
             tournament = game.tournament
             tournament.status = Tournament.TournamentState.FINISHED
@@ -55,3 +57,13 @@ class SetGameScore(APIView):
         else:
             next_game.player2 = proceeding_player
         next_game.save()
+
+
+class SetTrophy(APIView):
+    def post(self, request, place: str):
+        file = request.FILES["file"]
+        try:
+            image_handling.verify_image(file)
+        except RuntimeError as e:
+            return HttpResponse(str(e), status=400)
+        return HttpResponse()

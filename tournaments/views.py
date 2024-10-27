@@ -7,7 +7,7 @@ from django.template.response import TemplateResponse
 
 from chatting.src import utility as chatting_utility
 from general_src.base_view import BaseView
-from tournaments.models import Tournament, TournamentGame, TournamentParticipant
+from tournaments.models import Tournament, TournamentGame, TournamentParticipant, TournamentPrize
 from tournaments.src import utility
 
 
@@ -56,6 +56,8 @@ class CreateTournamentView(BaseView):
         TournamentParticipant.objects.create(user_id=request.user.pk, tournament=tournament)
         for invite in invitees:
             TournamentParticipant.objects.create(user_id=invite, tournament=tournament)
+        for nr in range(3):
+            TournamentPrize.objects.create(tournament=tournament)
         return redirect("/tournament/")
 
 

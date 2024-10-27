@@ -64,3 +64,12 @@ class TournamentParticipant(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
     place = models.IntegerField(null=True, default=None)
+
+
+class TournamentPrize(models.Model):
+    class Meta:
+        db_table = "tournament_prize"
+
+    participant = models.ForeignKey(TournamentParticipant, on_delete=models.CASCADE, null=True, default=None)
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
+    trophy = models.ImageField(upload_to="tournament_prizes", default="default_prize.png")

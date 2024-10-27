@@ -10,4 +10,5 @@ urlpatterns = [
     path("login/upload_image", login_api.UploadLoginImage.as_view()),
     path("login/get_image", login_api.GetProfileImage.as_view()),
     path("tournament/add_score/<str:db_id>", tournament_api.SetGameScore.as_view()),
+    path("tournament/set_trophy/<str:place>", tournament_api.SetTrophy.as_view()),
 ]
