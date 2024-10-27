@@ -1,5 +1,7 @@
 from collections import defaultdict
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Union
+
+from django.contrib.auth.models import User
 
 from scoreboard.models import MatchResult, Result
 from tournaments.models import Tournament, TournamentGame, TournamentParticipant, TournamentPrize
@@ -88,3 +90,11 @@ def get_tournament_match_details(games: Iterable[TournamentGame]) -> List[Dict[s
             }
         )
     return game_data
+
+
+def get_trophy_data(user: User) -> List[Dict[str, Union[int, str]]]:
+    prizes = TournamentPrize.objects.filter(participant__user=user).select_related("tournament")
+    data = []
+    for prize in prizes:
+        data.append({"tournament": prize.tournament.name, "place": prize.place, "url": prize.trophy.url})
+    return data

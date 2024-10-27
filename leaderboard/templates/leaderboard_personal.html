@@ -54,7 +54,7 @@
                 </div>
             </div>
         </div>
-        <div style="flex: 40%">
+        <div style="flex: 20%; align-items: center">
             <table>
                 <tbody>
                 <tr>
@@ -105,6 +105,40 @@
                         {{ profile.winrate }} %
                     </td>
                 </tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="flex: 20%; margin-right: 30px; align-items: center">
+            <table>
+                <thead>
+                <tr>
+                    <th style="color: white;">
+                        Tournament
+                    </th>
+                    <th style="color: white;">
+                        Place
+                    </th>
+                    <th style="color: white;">
+                        Trophy
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for trophy in profile.trophies %}
+                    <tr>
+                        <td>
+                            {{ trophy.tournament }}
+                        </td>
+                        <td>
+                            {{ trophy.place }}
+                        </td>
+                        <td>
+                            <div class="trophy-pic">
+                                <img src="{{ trophy.url }}" width="50"/>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -251,7 +285,7 @@
                     profile_picture.src = url;
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
-                   $.notify(XMLHttpRequest.responseText);
+                    $.notify(XMLHttpRequest.responseText);
                 }
             });
         }

@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 
 from login.models import UserData
 from scoreboard.models import MatchResult, Result
+from tournaments.src.utility import get_trophy_data
 
 
 def get_player_data(players: Iterable[UserData]) -> List[Dict[str, str]]:
@@ -29,6 +30,7 @@ def get_player_data(players: Iterable[UserData]) -> List[Dict[str, str]]:
                 "winrate": winrate,
                 "total_games": player.total,
                 "image_url": player.profile_picture.url,
+                "trophies": get_trophy_data(player.user),
             }
         )
     return data
