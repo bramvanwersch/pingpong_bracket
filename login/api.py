@@ -15,7 +15,11 @@ class UploadLoginImage(APIView):
             image_handling.verify_image(file)
         except RuntimeError as e:
             return HttpResponse(str(e), status=400)
-        os.remove(user_data.profile_picture.path)
+        if user_data.profile_picture.name != "default_profile_picture.png":
+            try:
+                os.remove(user_data.profile_picture.path)
+            except FileNotFoundError:
+                pass
         user_data.profile_picture = file
         user_data.save()
         return HttpResponse()

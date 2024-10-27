@@ -2,13 +2,32 @@ from collections import defaultdict
 from typing import Any, Dict, Iterable, List
 
 from scoreboard.models import MatchResult, Result
-from tournaments.models import Tournament, TournamentGame, TournamentParticipant
+from tournaments.models import Tournament, TournamentGame, TournamentParticipant, TournamentPrize
 
 
-def tournament_table_data(tournaments: Iterable[Tournament]):
+def tournament_table_data(tournaments: Iterable[Tournament], add_places: bool = False):
     final_data = []
     for tournament in tournaments:
-        participants = list(TournamentParticipant.objects.filter(tournament=tournament).select_related("user"))
+        participants = list(
+            TournamentParticipant.objects.filter(tournament=tournament).select_related("user").order_by("place")
+        )
+        places = {}
+        if add_places:
+            places = [
+                {"place": nr + 1, "prize": None, "player": "-"}
+                for nr in range(TournamentParticipant.objects.filter(tournament=tournament).count())
+            ]
+            prizes = TournamentPrize.objects.filter(tournament=tournament)
+            for participant in participants:
+                if participant.place is None:
+                    continue
+                place = places[participant.place - 1]
+                place["player"] = participant.user.username
+            for prize in prizes:
+                try:
+                    places[prize.place - 1]["prize"] = prize.trophy.url
+                except IndexError:
+                    continue
         final_data.append(
             {
                 "name": tournament.name,
@@ -21,6 +40,7 @@ def tournament_table_data(tournaments: Iterable[Tournament]):
                 "creator": tournament.creator,
                 "db_id": tournament.pk,
                 "participants": [p.user for p in participants],
+                "places": places,
             }
         )
     return final_data

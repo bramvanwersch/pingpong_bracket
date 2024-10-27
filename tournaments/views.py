@@ -57,7 +57,7 @@ class CreateTournamentView(BaseView):
         for invite in invitees:
             TournamentParticipant.objects.create(user_id=invite, tournament=tournament)
         for nr in range(3):
-            TournamentPrize.objects.create(tournament=tournament)
+            TournamentPrize.objects.create(tournament=tournament, place=nr + 1)
         return redirect("/tournament/")
 
 
@@ -148,7 +148,7 @@ class StartTournamentView(BaseView):
 class TournamentDetailView(BaseView):
     def get(self, request, tournament_id):
         tournament = Tournament.objects.get(pk=tournament_id)
-        data = utility.tournament_table_data([tournament])[0]
+        data = utility.tournament_table_data([tournament], add_places=True)[0]
         games = list(
             TournamentGame.objects.filter(tournament=tournament_id)
             .select_related("player1", "player2")

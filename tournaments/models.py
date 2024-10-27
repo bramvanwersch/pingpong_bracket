@@ -1,5 +1,10 @@
+from typing import TYPE_CHECKING
+
 from django.contrib.auth.models import User
 from django.db import models
+
+if TYPE_CHECKING:
+    from tournaments.src.game_format import BaseFormat
 
 
 class Tournament(models.Model):
@@ -20,11 +25,21 @@ class Tournament(models.Model):
 
     class TournamentType(models.Choices):
         SINGLE_ELIMINATION = "Single elimination"
-        SEEDING_AND_SINGLE_ELIMINATION = "Seeding and single elimination"
+        # ROUND_ROBBIN = "Round-robin"
+        # SEEDING_AND_SINGLE_ELIMINATION = "Seeding and single elimination"
 
     tournament_type = models.CharField(max_length=64, choices=TournamentType.choices)
 
     invite_only = models.BooleanField(default=False)
+
+    def get_tournament_format(self) -> "BaseFormat":
+        # circular imports
+        from tournaments.src.game_format import EliminationFormat
+
+        if self.tournament_type == "Single elimination":
+            return EliminationFormat()
+        else:
+            raise NotImplementedError
 
 
 class TournamentGame(models.Model):
@@ -44,7 +59,7 @@ class TournamentGame(models.Model):
 
     class GameType(models.Choices):
         ELIMINATION = "Elimination"
-        SEEDING = "Seeding"
+        NORMAL = "Normal"
 
     game_type = models.CharField(max_length=32, choices=GameType.choices)
 
@@ -73,3 +88,4 @@ class TournamentPrize(models.Model):
     participant = models.ForeignKey(TournamentParticipant, on_delete=models.CASCADE, null=True, default=None)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
     trophy = models.ImageField(upload_to="tournament_prizes", default="default_prize.png")
+    place = models.IntegerField()
