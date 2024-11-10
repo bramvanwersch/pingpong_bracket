@@ -9,6 +9,7 @@ from login.models import UserData
 from login.src.utility import get_comparative_player_data, get_player_data
 from scoreboard.models import MatchResult, Result
 from scoreboard.src.utility import get_player_rating_data
+from tournaments.models import TournamentGame
 
 
 class LeaderboardView(BaseView):
@@ -84,6 +85,9 @@ class LeaderboardCompareView(BaseView):
 class LeaderboardDeleteView(BaseView):
     def get(self, request, db_id: str):
         match = MatchResult.objects.get(id=db_id)
+        if TournamentGame.objects.filter(match_id=match.match_id).first() is not None:
+            # no
+            return HttpResponseRedirect(f"/leaderboard/{request.user.username}")
         player = UserData.objects.get(user=match.player)
         opponent = UserData.objects.get(user=match.opponent)
         result = match.get_result()

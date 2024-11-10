@@ -173,6 +173,9 @@
                     Delete
                 </th>
             {% endif %}
+            <th style="color: white;">
+                Tournament
+            </th>
         </tr>
         </thead>
         <tbody>
@@ -213,11 +216,20 @@
                 </td>
                 {% if profile.name == user.username %}
                     <td>
-                        <button onclick="delete_entry({{ match.db_id }})">
-                            Delete
-                        </button>
+                        {% if not match.tournament_id %}
+                            <button onclick="delete_entry({{ match.db_id }})">
+                                Delete
+                            </button>
+                        {% endif %}
                     </td>
                 {% endif %}
+                <td>
+                    {% if match.tournament_id %}
+                        <a href="/tournament/detail/{{ match.tournament_id }}">{{ match.tournament_name }}</a>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
         </tbody>

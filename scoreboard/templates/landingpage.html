@@ -26,6 +26,7 @@
                         <th style="color: white;"><span>Score</span></th>
                         <th style="color: white;"><span>Rating change</span></th>
                         <th style="color: white;"><span>Date</span></th>
+                        <th style="color: white;"><span>Tournament</span></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -41,6 +42,13 @@
                             <td>{{ match.score }}</td>
                             <td>{{ match.rating }}</td>
                             <td>{{ match.date }}</td>
+                            <td>
+                                {% if match.tournament_id %}
+                                    <a href="/tournament/detail/{{ match.tournament_id }}">{{ match.tournament_name }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>
