@@ -96,6 +96,7 @@ class StartTournamentView(BaseView):
         start_date: datetime.date,
         end_date: datetime.date,
     ):
+        print(start_date, end_date)
         total_days = (end_date - start_date).days
         nr_rounds = 1
         while 2**nr_rounds < len(participants):
@@ -104,7 +105,7 @@ class StartTournamentView(BaseView):
         round_data = {}
         for power, round_nr in enumerate(range(nr_rounds, 0, -1)):
             nr_games = 2**power
-            round_end_date = end_date - datetime.timedelta(days=(nr_rounds - round_nr - 1) * days_per_round)
+            round_end_date = end_date - datetime.timedelta(days=(nr_rounds - round_nr) * days_per_round)
             round_data[round_nr] = []
             for game_nr in range(1, nr_games + 1):
                 game = TournamentGame.objects.create(

@@ -201,7 +201,7 @@
                                         {{ game.end_date }}
                                     </td>
                                     <td>
-                                        {% if game.result == 'tbd' %}
+                                        {% if game.result == 'tbd' and game.player1 != 'tbd' and game.player2 != 'tbd'%}
                                             {% if user.username == game.player1 or user.username == game.player2 or user == data.creator %}
                                                 <input value="{{ game.p1_score }}" type="text" id="{{ game.db_id }}_1"
                                                        style="width: 25px; text-align: center">
@@ -225,7 +225,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if game.result == 'tbd' %}
+                                        {% if game.result == 'tbd' and game.player1 != 'tbd' and game.player2 != 'tbd'%}
                                             {% if user.username == game.player1 or user.username == game.player2 or user == data.creator %}
                                                 <button onclick="submit_score({{ game.db_id }})">
                                                     submit
