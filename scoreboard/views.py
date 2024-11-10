@@ -1,7 +1,7 @@
-from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 
+from chatting.src.utility import get_user_mapping
 from general_src.base_view import BaseView
 from login.models import UserData
 from scoreboard.models import MatchResult
@@ -11,8 +11,7 @@ from scoreboard.src.utility import get_rating_data
 
 class LandingPage(BaseView):
     def get(self, request):
-        names = {u.username for u in User.objects.all()}
-        names.remove(request.user.username)
+        names = list(get_user_mapping([request.user]).keys())
         data = get_rating_data(MatchResult.objects.all().order_by("-date"))
         return TemplateResponse(
             request,

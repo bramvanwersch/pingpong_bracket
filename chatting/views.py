@@ -1,5 +1,3 @@
-import datetime
-
 from django.contrib.auth.models import User
 from django.db.models.functions import Lower
 from django.shortcuts import redirect
@@ -57,12 +55,5 @@ class NewChatRoomView(BaseView):
 class ChatChallengeView(BaseView):
     def get(self, request, user_name: str):
         challenge_user = User.objects.get(username=user_name)
-        group = ChatGroup.create_or_get_group(request.user, [challenge_user])
-        message = ChatMessage.objects.create(
-            message="I challenge you to a match!",
-            sender=request.user,
-            chat_group_id=group.pk,
-            date=datetime.datetime.now(),
-        )
-        utility.send_message(message, request.user, f"{group.id}")
-        return redirect(f"/chatroom/{group.pk}")
+        utility.send_system_message([challenge_user], f"{request.user.username} challenges you to a match!")
+        return redirect("/chatroom")

@@ -1,10 +1,11 @@
+import datetime
 from typing import Dict, List
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.db.models.functions import Lower
 
-from chatting.models import ChatGroupUser, ChatMessage, UserMessage
+from chatting.models import ChatGroup, ChatGroupUser, ChatMessage, UserMessage
 from login.models import User
 
 
@@ -14,6 +15,7 @@ def get_user_mapping(exclude_users: List["User"] = None) -> Dict[str, int]:
         exclude_users = []
     for user in exclude_users:
         del names[user.username]
+        del names["System"]
     return names
 
 
@@ -51,3 +53,16 @@ def send_message(chat_message: ChatMessage, sender: User, group_id: str):
             "date": chat_message.date.strftime("%Y-%m-%d %H:%M:%S"),
         },
     )
+
+
+def send_system_message(users: List[User], message: str):
+    system_user = User.objects.get(username="System")
+    for user in users:
+        group = ChatGroup.create_or_get_group(system_user, [user])
+        chat_message = ChatMessage.objects.create(
+            message=message,
+            sender=system_user,
+            chat_group_id=group.pk,
+            date=datetime.datetime.now(),
+        )
+        send_message(chat_message, system_user, f"{group.id}")

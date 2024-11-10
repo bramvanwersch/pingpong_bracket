@@ -2,10 +2,12 @@ import datetime
 import random
 from typing import List
 
+from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 
 from chatting.src import utility as chatting_utility
+from chatting.src.utility import send_system_message
 from general_src.base_view import BaseView
 from tournaments.models import Tournament, TournamentGame, TournamentParticipant, TournamentPrize
 from tournaments.src import utility
@@ -56,6 +58,10 @@ class CreateTournamentView(BaseView):
         TournamentParticipant.objects.create(user_id=request.user.pk, tournament=tournament)
         for invite in invitees:
             TournamentParticipant.objects.create(user_id=invite, tournament=tournament)
+        if len(invitees) > 0:
+            send_system_message(
+                list(User.objects.filter(pk__in=invitees)), f"You have been invited to the {name} tournament!"
+            )
         for nr in range(3):
             TournamentPrize.objects.create(tournament=tournament, place=nr + 1)
         return redirect("/tournament/")

@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 
+from chatting.src.utility import get_user_mapping
 from general_src.base_view import BaseView
 from login.models import UserData
 from login.src.utility import get_comparative_player_data, get_player_data
@@ -32,8 +33,7 @@ class LeaderboardDetailView(BaseView):
         matches = sorted(
             get_player_rating_data(MatchResult.get_player_scores(user)[:50]), key=lambda x: x["date"], reverse=True
         )
-        names = {u.username for u in User.objects.all()}
-        names.remove(name)
+        names = list(get_user_mapping([request.user]).keys())
         ratings, labels = self._get_match_line_data(user)
         if user == request.user:
             current = "my_profile"
