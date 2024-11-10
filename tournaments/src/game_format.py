@@ -69,16 +69,22 @@ class EliminationFormat(BaseFormat):
 
     def _set_player_placement(self, tournament: Tournament):
         tournament_games = list(TournamentGame.objects.filter(tournament_id=tournament.id, is_dummy=False))
-        games = MatchResult.objects.filter(match_id__in=[g.match_id for g in tournament_games]).order_by("date")
+        winning_games = list(
+            mr
+            for mr in MatchResult.objects.filter(match_id__in=[g.match_id for g in tournament_games]).order_by("date")
+            if mr.get_result() == Result.WIN
+        )
         # set placement of players
         place = len(tournament_games) + 1
-        for result in games:
-            if result.get_result() != Result.WIN:
-                continue
-            participant1 = TournamentParticipant.objects.get(user_id=result.player, tournament_id=tournament.id)
-            participant1.place = place - 1
-            participant1.save()
+        for result in winning_games:
             participant2 = TournamentParticipant.objects.get(user_id=result.opponent_id, tournament_id=tournament.id)
             participant2.place = place
             participant2.save()
             place -= 1
+        # add first place
+        if place == 1:
+            participant1 = TournamentParticipant.objects.get(
+                user_id=winning_games[-1].player, tournament_id=tournament.id
+            )
+            participant1.place = 1
+            participant1.save()

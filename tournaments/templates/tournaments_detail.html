@@ -201,28 +201,40 @@
                                         {{ game.end_date }}
                                     </td>
                                     <td>
-                                        {% if game.result != 'tbd' or game.player1 == 'tbd' or game.player2 == 'tbd' %}
+                                        {% if game.result == 'tbd' %}
+                                            {% if user.username == game.player1 or user.username == game.player2 or user == data.creator %}
+                                                <input value="{{ game.p1_score }}" type="text" id="{{ game.db_id }}_1"
+                                                       style="width: 25px; text-align: center">
+                                                -
+                                                <input value="{{ game.p2_score }}" type="text" id="{{ game.db_id }}_2"
+                                                       style="width: 25px; text-align: center">
+                                            {% else %}
+                                                <input value="{{ game.p1_score }}" type="text" disabled
+                                                       style="width: 25px; text-align: center">
+                                                -
+                                                <input value="{{ game.p2_score }}" type="text" disabled
+                                                       style="width: 25px; text-align: center">
+                                            {% endif %}
+
+                                        {% else %}
                                             <input value="{{ game.p1_score }}" type="text" disabled
                                                    style="width: 25px; text-align: center">
                                             -
                                             <input value="{{ game.p2_score }}" type="text" disabled
                                                    style="width: 25px; text-align: center">
-                                        {% elif user == game.player1 or user == game.player2 or user == data.creator %}
-                                            <input value="{{ game.p1_score }}" type="text" id="{{ game.db_id }}_1"
-                                                   style="width: 25px; text-align: center">
-                                            -
-                                            <input value="{{ game.p2_score }}" type="text" id="{{ game.db_id }}_2"
-                                                   style="width: 25px; text-align: center">
                                         {% endif %}
                                     </td>
-
                                     <td>
-                                        {% if game.result != 'tbd' or game.player1 == 'tbd' or game.player2 == 'tbd' %}
-                                            {{ game.result }}
+                                        {% if game.result == 'tbd' %}
+                                            {% if user.username == game.player1 or user.username == game.player2 or user == data.creator %}
+                                                <button onclick="submit_score({{ game.db_id }})">
+                                                    submit
+                                                </button>
+                                            {% else %}
+                                                {{ game.result }}
+                                            {% endif %}
                                         {% else %}
-                                            <button onclick="submit_score({{ game.db_id }})">
-                                                submit
-                                            </button>
+                                            {{ game.result }}
                                         {% endif %}
                                     </td>
                                 </tr>
